@@ -8,6 +8,10 @@ Additionally, the `Autofac` implementation (the only implementation thus far) pr
 
 Check the demo project for how to use it.
 
+## NuGet Packages
+> Dependo: https://www.nuget.org/packages/Dependo/
+> Dependo.Autofac: https://www.nuget.org/packages/Dependo.Autofac/
+
 ## Credits
 
 Much of the code comes from an old version of nopCommerce
