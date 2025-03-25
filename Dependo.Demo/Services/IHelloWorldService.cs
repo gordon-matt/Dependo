@@ -1,15 +1,11 @@
-﻿namespace Dependo.Demo.Services
-{
-    public interface IHelloWorldService
-    {
-        string HelloWorld();
-    }
+﻿namespace Dependo.Demo.Services;
 
-    public class HelloWorldService : IHelloWorldService
-    {
-        public string HelloWorld()
-        {
-            return "Hello World";
-        }
-    }
+public interface IHelloWorldService
+{
+    string HelloWorld();
+}
+
+public class HelloWorldService : IHelloWorldService
+{
+    public string HelloWorld() => "Hello World";
 }

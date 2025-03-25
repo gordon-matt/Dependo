@@ -1,11 +1,10 @@
 ﻿using Autofac;
 
-namespace Dependo.Autofac
-{
-    public interface IDependencyRegistrar
-    {
-        void Register(ContainerBuilder builder, ITypeFinder typeFinder);
+namespace Dependo.Autofac;
 
-        int Order { get; }
-    }
+public interface IDependencyRegistrar
+{
+    void Register(ContainerBuilder builder, ITypeFinder typeFinder);
+
+    int Order { get; }
 }
