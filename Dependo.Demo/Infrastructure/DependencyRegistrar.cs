@@ -2,15 +2,12 @@
 using Dependo.Autofac;
 using Dependo.Demo.Services;
 
-namespace Dependo.Demo.Infrastructure
-{
-    public class DependencyRegistrar : IDependencyRegistrar
-    {
-        public int Order => 1;
+namespace Dependo.Demo.Infrastructure;
 
-        public void Register(ContainerBuilder builder, ITypeFinder typeFinder)
-        {
-            builder.RegisterType<HelloWorldService>().As<IHelloWorldService>();
-        }
-    }
+public class DependencyRegistrar : IDependencyRegistrar
+{
+    public int Order => 1;
+
+    public void Register(ContainerBuilder builder, ITypeFinder typeFinder) =>
+        builder.RegisterType<HelloWorldService>().As<IHelloWorldService>();
 }
