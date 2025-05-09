@@ -7,12 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.Autofac;
 
+/// <summary>
+/// Autofac implementation of the Dependo engine
+/// </summary>
 public class AutofacEngine : IEngine, IDisposable
 {
     #region Private Members
 
-    private AutofacContainerManager containerManager;
-    private bool disposed = false;
+    private AutofacContainerManager? containerManager;
+    private bool disposed;
 
     #endregion Private Members
 
@@ -21,58 +24,83 @@ public class AutofacEngine : IEngine, IDisposable
     /// <summary>
     /// Gets or sets service provider
     /// </summary>
-    public virtual IServiceProvider ServiceProvider { get; private set; }
+    public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
 
     #endregion Properties
 
     #region IEngine Members
 
     /// <summary>
-    /// Add and configure services
+    /// Configure services for the application
     /// </summary>
-    /// <param name="services">Collection of service descriptors</param>
+    /// <param name="containerBuilder">Container builder from Autofac</param>
     /// <param name="configuration">Configuration root of the application</param>
     /// <returns>Service provider</returns>
     public virtual IServiceProvider ConfigureServices(ContainerBuilder containerBuilder, IConfigurationRoot configuration)
     {
-        //find startup configurations provided by other assemblies
+        // Find startup configurations provided by other assemblies
         var typeFinder = new WebAppTypeFinder();
 
-        //register dependencies
+        // Register dependencies
         RegisterDependencies(containerBuilder, typeFinder);
 
-        //resolve assemblies here. otherwise, plugins can throw an exception when rendering views
+        // Resolve assemblies here to avoid exceptions when rendering views
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
         return ServiceProvider;
     }
 
+    /// <inheritdoc />
     public virtual T Resolve<T>() where T : class =>
-        containerManager.Resolve<T>();
+        containerManager?.Resolve<T>() ?? throw new InvalidOperationException("Container manager is not initialized");
 
+    /// <inheritdoc />
     public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
-        containerManager.Resolve<T>(ctorArgs);
+        containerManager?.Resolve<T>(ctorArgs) ?? throw new InvalidOperationException("Container manager is not initialized");
 
+    /// <inheritdoc />
     public virtual object Resolve(Type type) =>
-        containerManager.Resolve(type);
+        containerManager?.Resolve(type) ?? throw new InvalidOperationException("Container manager is not initialized");
 
+    /// <inheritdoc />
     public T ResolveNamed<T>(string name) where T : class =>
-        containerManager.ResolveNamed<T>(name);
+        containerManager?.ResolveNamed<T>(name) ?? throw new InvalidOperationException("Container manager is not initialized");
 
+    /// <inheritdoc />
     public virtual IEnumerable<T> ResolveAll<T>() =>
-        containerManager.ResolveAll<T>();
+        containerManager?.ResolveAll<T>() ?? throw new InvalidOperationException("Container manager is not initialized");
 
+    /// <inheritdoc />
     public IEnumerable<T> ResolveAllNamed<T>(string name) =>
-        containerManager.ResolveAllNamed<T>(name);
+        containerManager?.ResolveAllNamed<T>(name) ?? throw new InvalidOperationException("Container manager is not initialized");
 
+    /// <inheritdoc />
     public virtual object ResolveUnregistered(Type type) =>
-        containerManager.ResolveUnregistered(type);
+        containerManager?.ResolveUnregistered(type) ?? throw new InvalidOperationException("Container manager is not initialized");
 
-    public bool TryResolve<T>(out T instance) where T : class =>
-        containerManager.TryResolve<T>(out instance);
+    /// <inheritdoc />
+    public bool TryResolve<T>(out T instance) where T : class
+    {
+        if (containerManager == null)
+        {
+            instance = default!;
+            return false;
+        }
+        
+        return containerManager.TryResolve(out instance);
+    }
 
-    public bool TryResolve(Type serviceType, out object instance) =>
-        containerManager.TryResolve(serviceType, out instance);
+    /// <inheritdoc />
+    public bool TryResolve(Type serviceType, out object instance)
+    {
+        if (containerManager == null)
+        {
+            instance = default!;
+            return false;
+        }
+        
+        return containerManager.TryResolve(serviceType, out instance);
+    }
 
     #endregion IEngine Members
 
@@ -85,8 +113,8 @@ public class AutofacEngine : IEngine, IDisposable
     protected virtual IServiceProvider GetServiceProvider()
     {
         var httpContextAccessor = ServiceProvider.GetService<IHttpContextAccessor>();
-        var context = httpContextAccessor.HttpContext;
-        return context != null ? context.RequestServices : ServiceProvider;
+        var context = httpContextAccessor?.HttpContext;
+        return context?.RequestServices ?? ServiceProvider;
     }
 
     /// <summary>
@@ -96,43 +124,43 @@ public class AutofacEngine : IEngine, IDisposable
     /// <param name="typeFinder">Type finder</param>
     protected virtual IServiceProvider RegisterDependencies(ContainerBuilder containerBuilder, ITypeFinder typeFinder)
     {
-        //register engine
+        // Register engine
         containerBuilder.RegisterInstance(this).As<IEngine>().SingleInstance();
 
-        //register type finder
+        // Register type finder
         containerBuilder.RegisterInstance(typeFinder).As<ITypeFinder>().SingleInstance();
 
-        //find dependency registrars provided by other assemblies
+        // Find dependency registrars provided by other assemblies
         var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>();
 
-        //create and sort instances of dependency registrars
+        // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
-            .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x))
+            .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
             .OrderBy(x => x.Order);
 
-        //register all provided dependencies
+        // Register all provided dependencies
         foreach (var dependencyRegistrar in instances)
         {
             dependencyRegistrar.Register(containerBuilder, typeFinder);
         }
 
-        //create service provider
+        // Create service provider
         var container = containerBuilder.Build();
         ServiceProvider = new AutofacServiceProvider(container);
         containerManager = new AutofacContainerManager(container);
         return ServiceProvider;
     }
 
-    private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+    private Assembly? CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
     {
-        //check for assembly already loaded
+        // Check for assembly already loaded
         var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
         if (assembly != null)
         {
             return assembly;
         }
 
-        //get assembly from TypeFinder
+        // Get assembly from TypeFinder
         var typeFinder = Resolve<ITypeFinder>();
         return typeFinder.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
     }
@@ -141,12 +169,17 @@ public class AutofacEngine : IEngine, IDisposable
 
     #region IDisposable Members
 
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Dispose engine resources
+    /// </summary>
+    /// <param name="disposing">Indicates whether the method was called from Dispose()</param>
     protected virtual void Dispose(bool disposing)
     {
         if (disposed)
@@ -156,11 +189,9 @@ public class AutofacEngine : IEngine, IDisposable
 
         if (disposing)
         {
-            containerManager.Dispose();
-            // Free any other managed objects here.
+            containerManager?.Dispose();
         }
 
-        // Free any unmanaged objects here.
         disposed = true;
     }
 

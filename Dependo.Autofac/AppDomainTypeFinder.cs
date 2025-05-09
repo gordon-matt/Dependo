@@ -5,10 +5,8 @@ using System.Text.RegularExpressions;
 namespace Dependo.Autofac;
 
 /// <summary>
-/// A class that finds types needed by Mantle by looping assemblies in the
-/// currently executing AppDomain. Only assemblies whose names matches
-/// certain patterns are investigated and an optional list of assemblies
-/// referenced by <see cref="AssemblyNames"/> are always investigated.
+/// A class that finds types needed by Dependo by loading assemblies in the
+/// currently executing AppDomain.
 /// </summary>
 internal class AppDomainTypeFinder : ITypeFinder
 {
@@ -17,17 +15,16 @@ internal class AppDomainTypeFinder : ITypeFinder
     /// <summary>The app domain to look for types in.</summary>
     public virtual AppDomain App => AppDomain.CurrentDomain;
 
-    /// <summary>Gets or sets assemblies loaded a startup in addition to those loaded in the AppDomain.</summary>
+    /// <summary>Gets or sets assemblies loaded at startup in addition to those loaded in the AppDomain.</summary>
     public IList<string> AssemblyNames { get; set; } = [];
 
-    /// <summary>Gets or sets the pattern for dll that will be investigated. For ease of use this defaults to match all but to increase performance you might want to configure a pattern that includes assemblies and your own.</summary>
-    /// <remarks>If you change this so that Mantle assemblies aren't investigated (e.g. by not including something like "^Mantle|..." you may break core functionality.</remarks>
+    /// <summary>Gets or sets the pattern for assemblies that will be investigated.</summary>
     public string AssemblyRestrictToLoadingPattern { get; set; } = ".*";
 
-    /// <summary>Gets the pattern for dlls that we know don't need to be investigated.</summary>
-    public string AssemblySkipLoadingPattern { get; set; } = "^System|^mscorlib|^Microsoft|^AjaxControlToolkit|^Antlr3|^Autofac|^AutoMapper|^Castle|^ComponentArt|^CppCodeProvider|^DotNetOpenAuth|^EntityFramework|^EPPlus|^FluentValidation|^ImageResizer|^itextsharp|^log4net|^MaxMind|^MbUnit|^MiniProfiler|^Mono.Math|^MvcContrib|^Newtonsoft|^NHibernate|^nunit|^Org.Mentalis|^PerlRegex|^QuickGraph|^Recaptcha|^Remotion|^RestSharp|^Rhino|^Telerik|^Iesi|^TestDriven|^TestFu|^UserAgentStringLibrary|^VJSharpCodeProvider|^WebActivator|^WebDev|^WebGrease";
+    /// <summary>Gets the pattern for assemblies that we know don't need to be investigated.</summary>
+    public string AssemblySkipLoadingPattern { get; set; } = "^System|^mscorlib|^Microsoft|^Autofac|^AutoMapper|^Castle|^EntityFramework|^EPPlus|^FluentValidation|^log4net|^Newtonsoft|^NLog|^Serilog|^SixLabors|^StackExchange|^Telerik";
 
-    /// <summary>Gets or sets whether Mantle should iterate assemblies in the app domain when loading Mantle types. Loading patterns are applied when loading these assemblies.</summary>
+    /// <summary>Gets or sets whether Dependo should iterate assemblies in the app domain when loading types.</summary>
     public bool LoadAppDomainAssemblies { get; set; } = true;
 
     /// <summary>
@@ -71,12 +68,12 @@ internal class AppDomainTypeFinder : ITypeFinder
         var result = new List<Type>();
         try
         {
-            foreach (var a in assemblies)
+            foreach (var assembly in assemblies)
             {
-                Type[] types = null;
+                Type[]? types = null;
                 try
                 {
-                    types = a.GetTypes();
+                    types = assembly.GetTypes();
                 }
                 catch
                 {
@@ -86,26 +83,32 @@ internal class AppDomainTypeFinder : ITypeFinder
                         throw;
                     }
                 }
-                if (types != null)
+
+                if (types == null)
                 {
-                    foreach (var t in types)
+                    continue;
+                }
+
+                foreach (var type in types)
+                {
+                    if (assignTypeFrom.IsAssignableFrom(type) ||
+                        (assignTypeFrom.IsGenericTypeDefinition && DoesTypeImplementOpenGeneric(type, assignTypeFrom)))
                     {
-                        if (assignTypeFrom.IsAssignableFrom(t) || (assignTypeFrom.IsGenericTypeDefinition && DoesTypeImplementOpenGeneric(t, assignTypeFrom)))
+                        if (type.IsInterface)
                         {
-                            if (!t.IsInterface)
+                            continue;
+                        }
+
+                        if (onlyConcreteClasses)
+                        {
+                            if (type.IsClass && !type.IsAbstract)
                             {
-                                if (onlyConcreteClasses)
-                                {
-                                    if (t.IsClass && !t.IsAbstract)
-                                    {
-                                        result.Add(t);
-                                    }
-                                }
-                                else
-                                {
-                                    result.Add(t);
-                                }
+                                result.Add(type);
                             }
+                        }
+                        else
+                        {
+                            result.Add(type);
                         }
                     }
                 }
@@ -113,12 +116,8 @@ internal class AppDomainTypeFinder : ITypeFinder
         }
         catch (ReflectionTypeLoadException ex)
         {
-            string msg = string.Empty;
-
-            foreach (var e in ex.LoaderExceptions)
-            {
-                msg += e.Message + Environment.NewLine;
-            }
+            var msg = string.Join(Environment.NewLine,
+                ex.LoaderExceptions.Where(e => e != null).Select(e => e.Message));
 
             var fail = new Exception(msg, ex);
             Debug.WriteLine(fail.Message, fail);
@@ -154,11 +153,11 @@ internal class AppDomainTypeFinder : ITypeFinder
     /// The name of the assembly to check.
     /// </param>
     /// <returns>
-    /// True if the assembly should be loaded into Mantle.
+    /// True if the assembly should be loaded into Dependo.
     /// </returns>
-    public virtual bool Matches(string assemblyFullName) =>
-        !Matches(assemblyFullName, AssemblySkipLoadingPattern)
-            && Matches(assemblyFullName, AssemblyRestrictToLoadingPattern);
+    public virtual bool IsAssemblySafeToLoad(string assemblyFullName) =>
+        !AssemblyNameMatches(assemblyFullName, AssemblySkipLoadingPattern)
+            && AssemblyNameMatches(assemblyFullName, AssemblyRestrictToLoadingPattern);
 
     /// <summary>
     /// Adds specifically configured assemblies.
@@ -170,13 +169,28 @@ internal class AppDomainTypeFinder : ITypeFinder
         foreach (string assemblyName in AssemblyNames)
         {
             var assembly = Assembly.Load(assemblyName);
-            if (!addedAssemblyNames.Contains(assembly.FullName))
+            if (!addedAssemblyNames.Contains(assembly.FullName!))
             {
                 assemblies.Add(assembly);
-                addedAssemblyNames.Add(assembly.FullName);
+                addedAssemblyNames.Add(assembly.FullName!);
             }
         }
     }
+
+    /// <summary>
+    /// Does assembly name match pattern?
+    /// </summary>
+    /// <param name="assemblyFullName">
+    /// The assembly name to match.
+    /// </param>
+    /// <param name="pattern">
+    /// The regular expression pattern to match against the assembly name.
+    /// </param>
+    /// <returns>
+    /// True if the pattern matches the assembly name.
+    /// </returns>
+    protected virtual bool AssemblyNameMatches(string assemblyFullName, string pattern) =>
+        Regex.IsMatch(assemblyFullName, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
     /// Does type implement generic?
@@ -196,7 +210,7 @@ internal class AppDomainTypeFinder : ITypeFinder
                     continue;
                 }
 
-                bool isMatch = genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
+                var isMatch = genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
                 return isMatch;
             }
             return false;
@@ -215,15 +229,15 @@ internal class AppDomainTypeFinder : ITypeFinder
     /// </param>
     protected virtual void LoadMatchingAssemblies(string directoryPath)
     {
-        var loadedAssemblyNames = new List<string>();
-        foreach (var a in GetAssemblies())
-        {
-            loadedAssemblyNames.Add(a.FullName);
-        }
-
         if (!Directory.Exists(directoryPath))
         {
             return;
+        }
+
+        var loadedAssemblyNames = new List<string>();
+        foreach (var assembly in GetAssemblies())
+        {
+            loadedAssemblyNames.Add(assembly.FullName!);
         }
 
         foreach (string dllPath in Directory.GetFiles(directoryPath, "*.dll"))
@@ -231,17 +245,10 @@ internal class AppDomainTypeFinder : ITypeFinder
             try
             {
                 var an = AssemblyName.GetAssemblyName(dllPath);
-                if (Matches(an.FullName) && !loadedAssemblyNames.Contains(an.FullName))
+                if (IsAssemblySafeToLoad(an.FullName) && !loadedAssemblyNames.Contains(an.FullName))
                 {
                     App.Load(an);
                 }
-
-                //old loading stuff
-                //Assembly a = Assembly.ReflectionOnlyLoadFrom(dllPath);
-                //if (Matches(a.FullName) && !loadedAssemblyNames.Contains(a.FullName))
-                //{
-                //    App.Load(a.FullName);
-                //}
             }
             catch (BadImageFormatException ex)
             {
@@ -251,36 +258,18 @@ internal class AppDomainTypeFinder : ITypeFinder
     }
 
     /// <summary>
-    /// Check if a dll is one of the shipped dlls that we know don't need to be investigated.
-    /// </summary>
-    /// <param name="assemblyFullName">
-    /// The assembly name to match.
-    /// </param>
-    /// <param name="pattern">
-    /// The regular expression pattern to match against the assembly name.
-    /// </param>
-    /// <returns>
-    /// True if the pattern matches the assembly name.
-    /// </returns>
-    protected virtual bool Matches(string assemblyFullName, string pattern) =>
-        Regex.IsMatch(assemblyFullName, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    /// <summary>
     /// Iterates all assemblies in the AppDomain and if it's name matches the configured patterns add it to our list.
     /// </summary>
     /// <param name="addedAssemblyNames"></param>
     /// <param name="assemblies"></param>
     private void AddAssembliesInAppDomain(List<string> addedAssemblyNames, List<Assembly> assemblies)
     {
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        foreach (var assembly in App.GetAssemblies())
         {
-            if (Matches(assembly.FullName))
+            if (!assembly.IsDynamic && !addedAssemblyNames.Contains(assembly.FullName!))
             {
-                if (!addedAssemblyNames.Contains(assembly.FullName))
-                {
-                    assemblies.Add(assembly);
-                    addedAssemblyNames.Add(assembly.FullName);
-                }
+                assemblies.Add(assembly);
+                addedAssemblyNames.Add(assembly.FullName!);
             }
         }
     }

@@ -3,48 +3,46 @@
 namespace Dependo.Autofac;
 
 /// <summary>
-/// Classes implementing this interface provide information about types
-/// to various services in the Mantle engine.
+/// Interface for classes that can find types in assemblies
 /// </summary>
 public interface ITypeFinder
 {
     /// <summary>
-    /// Find classes of type
+    /// Find classes of the specified type
     /// </summary>
-    /// <typeparam name="T">Type</typeparam>
+    /// <typeparam name="T">Base type to find derived types of</typeparam>
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-    /// <returns>Result</returns>
+    /// <returns>Collection of found types</returns>
     IEnumerable<Type> FindClassesOfType<T>(bool onlyConcreteClasses = true);
 
     /// <summary>
-    /// Find classes of type
+    /// Find classes of the specified type
     /// </summary>
-    /// <param name="assignTypeFrom">Assign type from</param>
+    /// <param name="assignTypeFrom">Base type to find derived types of</param>
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-    /// <returns>Result</returns>
-    /// <returns></returns>
+    /// <returns>Collection of found types</returns>
     IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true);
 
     /// <summary>
-    /// Find classes of type
+    /// Find classes of the specified type in the specified assemblies
     /// </summary>
-    /// <typeparam name="T">Type</typeparam>
-    /// <param name="assemblies">Assemblies</param>
+    /// <typeparam name="T">Base type to find derived types of</typeparam>
+    /// <param name="assemblies">Assemblies to search in</param>
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-    /// <returns>Result</returns>
+    /// <returns>Collection of found types</returns>
     IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true);
 
     /// <summary>
-    /// Find classes of type
+    /// Find classes of the specified type in the specified assemblies
     /// </summary>
-    /// <param name="assignTypeFrom">Assign type from</param>
-    /// <param name="assemblies">Assemblies</param>
+    /// <param name="assignTypeFrom">Base type to find derived types of</param>
+    /// <param name="assemblies">Assemblies to search in</param>
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-    /// <returns>Result</returns>
+    /// <returns>Collection of found types</returns>
     IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true);
 
     /// <summary>
-    /// Gets the assemblies related to the current implementation.
+    /// Gets the assemblies related to the current implementation
     /// </summary>
     /// <returns>A list of assemblies</returns>
     IList<Assembly> GetAssemblies();

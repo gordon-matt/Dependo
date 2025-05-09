@@ -5,28 +5,31 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.Autofac;
 
+/// <summary>
+/// Dependo implementation of Autofac service provider factory for ASP.NET Core
+/// </summary>
 public class DependableAutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
 {
     private readonly Action<ContainerBuilder> configurationAction;
-    private IServiceCollection services;
+    private IServiceCollection? services;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AutofacServiceProviderFactory"/> class.
+    /// Initializes a new instance of the <see cref="DependableAutofacServiceProviderFactory"/> class.
     /// </summary>
-    /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/> that adds component registrations to the conatiner.</param>
-    public DependableAutofacServiceProviderFactory(Action<ContainerBuilder> configurationAction = null)
+    /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/> that adds component registrations to the container.</param>
+    public DependableAutofacServiceProviderFactory(Action<ContainerBuilder>? configurationAction = null)
     {
         this.configurationAction = configurationAction ?? (builder => { });
     }
 
     /// <summary>
-    /// Creates a container builder from an <see cref="IServiceCollection" />.
+    /// Creates a container builder from an <see cref="IServiceCollection"/>.
     /// </summary>
     /// <param name="services">The collection of services.</param>
-    /// <returns>A container builder that can be used to create an <see cref="IServiceProvider" />.</returns>
+    /// <returns>A container builder that can be used to create an <see cref="IServiceProvider"/>.</returns>
     public ContainerBuilder CreateBuilder(IServiceCollection services)
     {
-        this.services = services; // To use in CreateServiceProvider()
+        this.services = services;
 
         var builder = new ContainerBuilder();
         builder.Populate(services);
@@ -35,10 +38,11 @@ public class DependableAutofacServiceProviderFactory : IServiceProviderFactory<C
     }
 
     /// <summary>
-    /// Creates an <see cref="IServiceProvider" /> from the container builder.
+    /// Creates an <see cref="IServiceProvider"/> from the container builder.
     /// </summary>
     /// <param name="containerBuilder">The container builder.</param>
-    /// <returns>An <see cref="IServiceProvider" />.</returns>
+    /// <returns>An <see cref="IServiceProvider"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when containerBuilder is null.</exception>
     public IServiceProvider CreateServiceProvider(ContainerBuilder containerBuilder)
     {
         if (containerBuilder == null)
@@ -46,14 +50,22 @@ public class DependableAutofacServiceProviderFactory : IServiceProviderFactory<C
             throw new ArgumentNullException(nameof(containerBuilder));
         }
 
-        //set base application path
+        if (services == null)
+        {
+            throw new InvalidOperationException("CreateBuilder must be called before CreateServiceProvider.");
+        }
+
+        // Build service provider for configuration access
         var provider = services.BuildServiceProvider();
         var configuration = provider.GetService<IConfigurationRoot>();
 
+        // Initialize engine and create service provider
         var engine = new AutofacEngine();
         var serviceProvider = engine.ConfigureServices(containerBuilder, configuration);
+        
+        // Set engine as the singleton instance
         EngineContext.Create(engine);
 
-        return serviceProvider; // AutofacServiceProvider
+        return serviceProvider;
     }
 }

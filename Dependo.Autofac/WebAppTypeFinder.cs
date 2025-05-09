@@ -4,14 +4,15 @@ namespace Dependo.Autofac;
 
 /// <summary>
 /// Provides information about types in the current web application.
-/// Optionally this class can look at all assemblies in the bin folder.
+/// Specifically looks at assemblies in the bin folder.
 /// </summary>
 internal class WebAppTypeFinder : AppDomainTypeFinder
 {
     private bool binFolderAssembliesLoaded;
 
     /// <summary>
-    /// Gets or sets whether assemblies in the bin folder of the web application should be specifically checked for being loaded on application load. This is need in situations where plugins need to be loaded in the AppDomain after the application been reloaded.
+    /// Gets or sets whether assemblies in the bin folder of the web application should be specifically checked for being loaded on application load.
+    /// This is needed in situations where plugins need to be loaded in the AppDomain after the application has been reloaded.
     /// </summary>
     public bool EnsureBinFolderAssembliesLoaded { get; set; } = true;
 
@@ -25,7 +26,6 @@ internal class WebAppTypeFinder : AppDomainTypeFinder
         {
             binFolderAssembliesLoaded = true;
             string binPath = GetBinDirectory();
-            //binPath = _webHelper.MapPath("~/bin");
             LoadMatchingAssemblies(binPath);
         }
 
@@ -33,8 +33,8 @@ internal class WebAppTypeFinder : AppDomainTypeFinder
     }
 
     /// <summary>
-    /// Gets a physical disk path of \Bin directory
+    /// Gets the bin directory path
     /// </summary>
-    /// <returns>The physical path. E.g. "c:\inetpub\wwwroot\bin"</returns>
+    /// <returns>The physical path to the bin directory</returns>
     public virtual string GetBinDirectory() => AppContext.BaseDirectory;
 }
