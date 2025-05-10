@@ -18,8 +18,5 @@ public interface ILoggingService
 public class ConsoleLoggingService : ILoggingService, IAutoRegisterService
 {
     /// <inheritdoc/>
-    public void Log(string message)
-    {
-        Console.WriteLine($"[LOG] {DateTime.Now}: {message}");
-    }
+    public void Log(string message) => Console.WriteLine($"[LOG] {DateTime.Now}: {message}");
 }

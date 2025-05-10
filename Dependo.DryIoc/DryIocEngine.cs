@@ -1,18 +1,19 @@
-using Lamar;
+using DryIoc;
+using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dependo.Lamar;
+namespace Dependo.DryIoc;
 
 /// <summary>
-/// Lamar implementation of the Dependo engine
+/// DryIoc implementation of the Dependo engine
 /// </summary>
-public class LamarEngine : IEngine, IDisposable
+public class DryIocEngine : IEngine, IDisposable
 {
     #region Private Members
 
-    private Container? _container;
+    private IContainer? _container;
     private bool _disposed;
 
     #endregion Private Members
@@ -34,73 +35,75 @@ public class LamarEngine : IEngine, IDisposable
     /// <param name="services">Service collection</param>
     /// <param name="configuration">Configuration root of the application</param>
     /// <returns>Service provider</returns>
-    public virtual IServiceProvider ConfigureServices(IServiceCollection services, IConfigurationRoot configuration)
+    public virtual IServiceProvider ConfigureServices(IContainer container, IConfigurationRoot configuration)
     {
         // Find startup configurations provided by other assemblies
         var typeFinder = new WebAppTypeFinder();
 
         // Register dependencies
-        _container = RegisterDependencies(services, typeFinder) as Container;
-        ServiceProvider = _container!;
+        ServiceProvider = RegisterDependencies(container, typeFinder);
+        _container = container;
 
         return ServiceProvider;
     }
 
-    //public virtual IServiceProvider ConfigureServices(IServiceCollection services, IConfigurationRoot configuration)
-    //{
-    //    // Find startup configurations provided by other assemblies
-    //    var typeFinder = new WebAppTypeFinder();
-
-    //    // Register dependencies
-    //    RegisterDependencies(services, typeFinder);
-
-    //    // Build the container
-    //    _container = new Container(services);
-    //    ServiceProvider = _container;
-
-    //    return ServiceProvider;
-    //}
-
     /// <inheritdoc />
     public virtual T Resolve<T>() where T : class =>
-        ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+        _container.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
-        throw new NotSupportedException("Lamar does not support passing constructor arguments");
+    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        // Convert dictionary to array of parameters
+        object[] args = ctorArgs.Values.ToArray();
+        return _container.Resolve<T>(args);
+    }
 
     /// <inheritdoc />
     public virtual object Resolve(Type type) =>
-        ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+        _container.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
 
     /// <inheritdoc />
     public T ResolveNamed<T>(string name) where T : class =>
-        _container == null ? throw new InvalidOperationException("Container is not initialized") : _container.GetInstance<T>(name);
+        _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container.Resolve<T>(serviceKey: name);
 
     /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
+    public virtual IEnumerable<T> ResolveAll<T>() => _container.ResolveMany<T>();
 
     /// <inheritdoc />
     public IEnumerable<T> ResolveAllNamed<T>(string name) =>
-        throw new NotSupportedException(
-            "Lamar does not support multiple named registrations of the same type. When registering, they get overriden. Call ResolveNamed<T> instead");
+        throw new NotSupportedException("DryIOC does not support multiple named registrations of the same type. When registering, an exception is thrown.");
+        //_container == null
+        //    ? throw new InvalidOperationException("Container is not initialized")
+        //    : _container.ResolveMany<T>(serviceKey: name);
 
     /// <inheritdoc />
     public virtual object ResolveUnregistered(Type type) =>
-        _container == null ? throw new InvalidOperationException("Container is not initialized") : _container.GetInstance(type);
+        throw new NotSupportedException("DryIOC does not support resolving unregistered services.");
+        
+        //_container == null
+        //    ? throw new InvalidOperationException("Container is not initialized")
+        //    : _container.Resolve(type, IfUnresolved.Throw);
 
     /// <inheritdoc />
     public bool TryResolve<T>(out T instance) where T : class
     {
-        instance = ServiceProvider.GetService<T>()!;
-        return instance != null;
+        instance = _container!.Resolve<T>(IfUnresolved.ReturnDefault)!;
+        return instance != default;
     }
 
     /// <inheritdoc />
     public bool TryResolve(Type serviceType, out object instance)
     {
-        instance = ServiceProvider.GetService(serviceType)!;
-        return instance != null;
+        instance = _container!.Resolve(serviceType, IfUnresolved.ReturnDefault);
+        return instance != default;
     }
 
     #endregion IEngine Members
@@ -112,32 +115,28 @@ public class LamarEngine : IEngine, IDisposable
     /// </summary>
     /// <param name="services">Service collection</param>
     /// <param name="typeFinder">Type finder</param>
-    protected virtual IServiceProvider RegisterDependencies(IServiceCollection services, ITypeFinder typeFinder)
+    protected virtual IServiceProvider RegisterDependencies(IContainer container, ITypeFinder typeFinder)
     {
         // Register engine
-        services.AddSingleton<IEngine>(this);
+        container.RegisterInstance(this);
 
         // Register type finder
-        services.AddSingleton(typeFinder);
+        container.RegisterInstance(typeFinder);
 
-        // Create a Lamar registry
-        var registry = new ServiceRegistry();
-        registry.AddRange(services);
-
-        // Create a Lamar container builder abstraction
-        var builder = new LamarContainerBuilder(registry);
+        // Create a DryIoc container builder abstraction
+        var builder = new DryIocContainerBuilder(container);
 
         // Find dependency registrars provided by other assemblies
         var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>()
             .Where(x => !typeof(IDependencyRegistrarAdapter).IsAssignableFrom(x));
 
-        // Find Lamar-specific registrars to create adapters for them
-        var lamarRegistrars = typeFinder.FindClassesOfType<ILamarDependencyRegistrar>();
+        // Find DryIoc-specific registrars to create adapters for them
+        var dryIocRegistrars = typeFinder.FindClassesOfType<IDryIocDependencyRegistrar>();
 
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
-            .Concat(lamarRegistrars.Select(x => LamarDependencyRegistrarAdapter.CreateFromType(x)))
+            .Concat(dryIocRegistrars.Select(x => DryIocDependencyRegistrarAdapter.CreateFromType(x)))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies
@@ -146,9 +145,7 @@ public class LamarEngine : IEngine, IDisposable
             dependencyRegistrar.Register(builder, typeFinder);
         }
 
-        // Create container
-        var container = new Container(registry);
-        return container;
+        return container.GetServiceProvider();
     }
 
     #endregion Non-Public Methods

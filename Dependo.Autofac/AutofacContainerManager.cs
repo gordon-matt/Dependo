@@ -123,7 +123,7 @@ internal class AutofacContainerManager : IDisposable
                 // Try to resolve constructor parameters
                 var parameters = constructor.GetParameters().Select(parameter =>
                 {
-                    var service = Resolve(parameter.ParameterType);
+                    object service = Resolve(parameter.ParameterType);
                     return service ?? throw new ApplicationException("Unable to resolve dependency");
                 });
 

@@ -1,27 +1,26 @@
-using Dependo.Lamar;
-using Lamar;
-using Lamar.IoC;
+using Dependo.DryIoc;
+using DryIoc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace Dependo.Tests;
 
-public class LamarEngineTests
+public class DryIocEngineTests
 {
-    private readonly ServiceRegistry serviceRegistry = [];
+    private readonly Container container = new Container();
     private readonly IContainerBuilder containerBuilder;
 
-    public LamarEngineTests()
+    public DryIocEngineTests()
     {
-        containerBuilder = new LamarContainerBuilder(serviceRegistry);
+        containerBuilder = new DryIocContainerBuilder(container);
     }
 
-    public LamarEngine ConfigureEngine(Action registerServices)
+    public DryIocEngine ConfigureEngine(Action registerServices)
     {
         registerServices();
-        var engine = new LamarEngine();
-        engine.ConfigureServices(serviceRegistry, new Mock<IConfigurationRoot>().Object);
+        var engine = new DryIocEngine();
+        engine.ConfigureServices(container, new Mock<IConfigurationRoot>().Object);
         return engine;
     }
 
@@ -46,18 +45,16 @@ public class LamarEngineTests
         using var engine = ConfigureEngine(() => { });
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => // Seems like a bug in Lamar.. since ResolveNamed correctly throws LamarMissingRegistrationException
+        Assert.Throws<ContainerException>(() =>
             engine.Resolve<ITestService>());
-
-        //Assert.Throws<LamarMissingRegistrationException>(() =>
-        //    engine.Resolve<ITestService>());
     }
 
     [Fact]
     public void Resolve_WithTypeParameter_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton));
+        using var engine = ConfigureEngine(() =>
+            containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton));
 
         // Act
         object service = engine.Resolve(typeof(ITestService));
@@ -71,7 +68,8 @@ public class LamarEngineTests
     public void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => serviceRegistry.For<ITestService>().Use<TestService>().Named("test-service").Lifetime = ServiceLifetime.Singleton);
+        using var engine = ConfigureEngine(() =>
+            container.Register<ITestService, TestService>(reuse: Reuse.Singleton, serviceKey: "test-service"));
 
         // Act
         var service = engine.ResolveNamed<ITestService>("test-service");
@@ -87,7 +85,7 @@ public class LamarEngineTests
         using var engine = ConfigureEngine(() => { });
 
         // Act & Assert
-        Assert.Throws<LamarMissingRegistrationException>(() =>
+        Assert.Throws<ContainerException>(() =>
             engine.ResolveNamed<ITestService>("test-service"));
     }
 
@@ -97,8 +95,10 @@ public class LamarEngineTests
         // Arrange
         using var engine = ConfigureEngine(() =>
         {
-            serviceRegistry.For<ITestService>().Use<TestService>().Named("test-services").Lifetime = ServiceLifetime.Singleton;
-            serviceRegistry.For<ITestService>().Use<AnotherTestService>().Named("test-services").Lifetime = ServiceLifetime.Singleton;
+            container.Register<ITestService, TestService>(reuse: Reuse.Singleton, serviceKey: "test-services");
+
+            // Attempting to register more than one service of the same type with the same key results in an exception anyway.
+            //container.Register<ITestService, AnotherTestService>(reuse: Reuse.Singleton, serviceKey: "test-services");
         });
 
         // Act & Assert
@@ -112,12 +112,9 @@ public class LamarEngineTests
         // Arrange
         using var engine = ConfigureEngine(() => { });
 
-        // Act
-        object service = engine.ResolveUnregistered(typeof(ConcreteService));
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.IsType<ConcreteService>(service);
+        // Act & Assert
+        Assert.Throws<NotSupportedException>(() =>
+            engine.ResolveUnregistered(typeof(ConcreteService)));
     }
 
     [Fact]
