@@ -13,7 +13,7 @@
 //    /// </summary>
 //    /// <param name="services">Service collection</param>
 //    /// <returns>Service collection</returns>
-//    public static IServiceCollection AddDependoDryIoc(this IServiceCollection services) => services.AddSingleton<IEngine, DryIocEngine>();
+//    public static IServiceCollection AddDependoDryIoc(this IServiceCollection services) => services.AddSingleton<IDependoContainer, DryIocDependoContainer>();
 
 //    /// <summary>
 //    /// Creates a Dependo DryIoc service provider factory

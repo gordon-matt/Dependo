@@ -6,32 +6,32 @@ using Moq;
 
 namespace Dependo.Tests;
 
-public class DryIocEngineTests
+public class DryIocDependoContainerTests
 {
     private readonly Container container = new Container();
     private readonly IContainerBuilder containerBuilder;
 
-    public DryIocEngineTests()
+    public DryIocDependoContainerTests()
     {
         containerBuilder = new DryIocContainerBuilder(container);
     }
 
-    public DryIocEngine ConfigureEngine(Action registerServices)
+    public DryIocDependoContainer ConfigureDependoContainer(Action registerServices)
     {
         registerServices();
-        var engine = new DryIocEngine();
-        engine.ConfigureServices(container, new Mock<IConfigurationRoot>().Object);
-        return engine;
+        var dependoContainer = new DryIocDependoContainer();
+        dependoContainer.ConfigureServices(container, new Mock<IConfigurationRoot>().Object);
+        return dependoContainer;
     }
 
     [Fact]
     public void Resolve_RegisteredType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        var service = engine.Resolve<ITestService>();
+        var service = dependoContainer.Resolve<ITestService>();
 
         // Assert
         Assert.NotNull(service);
@@ -41,23 +41,23 @@ public class DryIocEngineTests
     [Fact]
     public void Resolve_UnregisteredType_ThrowsException()
     {
-        // Configure the engine with our container
-        using var engine = ConfigureEngine(() => { });
+        // Configure the dependoContainer with our container
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act & Assert
         Assert.Throws<ContainerException>(() =>
-            engine.Resolve<ITestService>());
+            dependoContainer.Resolve<ITestService>());
     }
 
     [Fact]
     public void Resolve_WithTypeParameter_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
+        using var dependoContainer = ConfigureDependoContainer(() =>
             containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton));
 
         // Act
-        object service = engine.Resolve(typeof(ITestService));
+        object service = dependoContainer.Resolve(typeof(ITestService));
 
         // Assert
         Assert.NotNull(service);
@@ -68,11 +68,11 @@ public class DryIocEngineTests
     public void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
+        using var dependoContainer = ConfigureDependoContainer(() =>
             container.Register<ITestService, TestService>(reuse: Reuse.Singleton, serviceKey: "test-service"));
 
         // Act
-        var service = engine.ResolveNamed<ITestService>("test-service");
+        var service = dependoContainer.ResolveNamed<ITestService>("test-service");
 
         // Assert
         Assert.NotNull(service);
@@ -82,18 +82,18 @@ public class DryIocEngineTests
     [Fact]
     public void ResolveNamed_UnregisteredNamedType_ThrowsException()
     {
-        using var engine = ConfigureEngine(() => { });
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act & Assert
         Assert.Throws<ContainerException>(() =>
-            engine.ResolveNamed<ITestService>("test-service"));
+            dependoContainer.ResolveNamed<ITestService>("test-service"));
     }
 
     [Fact]
     public void ResolveAllNamed_MultipleNamedInstances_ReturnsAllInstances()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
+        using var dependoContainer = ConfigureDependoContainer(() =>
         {
             container.Register<ITestService, TestService>(reuse: Reuse.Singleton, serviceKey: "test-services");
 
@@ -103,28 +103,28 @@ public class DryIocEngineTests
 
         // Act & Assert
         Assert.Throws<NotSupportedException>(() =>
-            engine.ResolveAllNamed<ITestService>("test-services"));
+            dependoContainer.ResolveAllNamed<ITestService>("test-services"));
     }
 
     [Fact]
     public void ResolveUnregistered_UnregisteredType_CreatesInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => { });
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act & Assert
         Assert.Throws<NotSupportedException>(() =>
-            engine.ResolveUnregistered(typeof(ConcreteService)));
+            dependoContainer.ResolveUnregistered(typeof(ConcreteService)));
     }
 
     [Fact]
     public void TryResolveWithType_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        bool resolved = engine.TryResolve(typeof(ITestService), out object? service);
+        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
         Assert.True(resolved);
@@ -135,11 +135,11 @@ public class DryIocEngineTests
     [Fact]
     public void TryResolveWithType_UnregisteredType_ReturnsFalse()
     {
-        // Configure the engine with our container
-        using var engine = ConfigureEngine(() => { });
+        // Configure the dependoContainer with our container
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act
-        bool resolved = engine.TryResolve(typeof(ITestService), out object? service);
+        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
         Assert.False(resolved);
@@ -150,14 +150,14 @@ public class DryIocEngineTests
     public void ResolveAll_MultipleRegisteredInstances_ReturnsAllInstances()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
+        using var dependoContainer = ConfigureDependoContainer(() =>
         {
             containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
             containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton);
         });
 
         // Act
-        var services = engine.ResolveAll<ITestService>().ToList();
+        var services = dependoContainer.ResolveAll<ITestService>().ToList();
 
         // Assert
         Assert.Equal(2, services.Count);
@@ -169,10 +169,10 @@ public class DryIocEngineTests
     public void TryResolve_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        bool resolved = engine.TryResolve<ITestService>(out var service);
+        bool resolved = dependoContainer.TryResolve<ITestService>(out var service);
 
         // Assert
         Assert.True(resolved);
@@ -183,11 +183,11 @@ public class DryIocEngineTests
     [Fact]
     public void TryResolve_UnregisteredType_ReturnsFalse()
     {
-        // Configure the engine with our container
-        using var engine = ConfigureEngine(() => { });
+        // Configure the dependoContainer with our container
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act
-        bool resolved = engine.TryResolve<ITestService>(out var service);
+        bool resolved = dependoContainer.TryResolve<ITestService>(out var service);
 
         // Assert
         Assert.False(resolved);

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 namespace Dependo.DryIoc;
 
 /// <summary>
-/// DryIoc implementation of the Dependo engine
+/// DryIoc implementation of the Dependo container
 /// </summary>
-public class DryIocEngine : IEngine, IDisposable
+public class DryIocDependoContainer : IDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -25,7 +25,7 @@ public class DryIocEngine : IEngine, IDisposable
 
     #endregion Properties
 
-    #region IEngine Members
+    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -137,7 +137,7 @@ public class DryIocEngine : IEngine, IDisposable
         return instance != default;
     }
 
-    #endregion IEngine Members
+    #endregion IDependoContainer Members
 
     #region Non-Public Methods
 
@@ -148,7 +148,7 @@ public class DryIocEngine : IEngine, IDisposable
     /// <param name="typeFinder">Type finder</param>
     protected virtual IServiceProvider RegisterDependencies(IContainer container, ITypeFinder typeFinder)
     {
-        // Register engine
+        // Register dependo container
         container.RegisterInstance(this);
 
         // Register type finder
@@ -191,7 +191,7 @@ public class DryIocEngine : IEngine, IDisposable
     }
 
     /// <summary>
-    /// Dispose engine resources
+    /// Dispose dependo container resources
     /// </summary>
     /// <param name="disposing">Indicates whether the method was called from Dispose()</param>
     protected virtual void Dispose(bool disposing)
