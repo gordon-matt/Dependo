@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dependo.Lamar;
 
 /// <summary>
-/// Lamar implementation of the Dependo engine
+/// Lamar implementation of the Dependo container
 /// </summary>
-public class LamarEngine : IEngine, IDisposable
+public class LamarDependoContainer : IDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -26,7 +26,7 @@ public class LamarEngine : IEngine, IDisposable
 
     #endregion Properties
 
-    #region IEngine Members
+    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -103,7 +103,7 @@ public class LamarEngine : IEngine, IDisposable
         return instance != null;
     }
 
-    #endregion IEngine Members
+    #endregion IDependoContainer Members
 
     #region Non-Public Methods
 
@@ -114,8 +114,8 @@ public class LamarEngine : IEngine, IDisposable
     /// <param name="typeFinder">Type finder</param>
     protected virtual IServiceProvider RegisterDependencies(IServiceCollection services, ITypeFinder typeFinder)
     {
-        // Register engine
-        services.AddSingleton<IEngine>(this);
+        // Register dependo container
+        services.AddSingleton<IDependoContainer>(this);
 
         // Register type finder
         services.AddSingleton(typeFinder);
@@ -163,7 +163,7 @@ public class LamarEngine : IEngine, IDisposable
     }
 
     /// <summary>
-    /// Dispose engine resources
+    /// Dispose container resources
     /// </summary>
     /// <param name="disposing">Indicates whether the method was called from Dispose()</param>
     protected virtual void Dispose(bool disposing)

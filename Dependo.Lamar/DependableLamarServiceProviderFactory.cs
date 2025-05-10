@@ -61,15 +61,15 @@ public class DependableLamarServiceProviderFactory : IServiceProviderFactory<Ser
 
         var configuration = provider.GetService<IConfigurationRoot>();
 
-        // Initialize engine
+        // Initialize dependo container
 #pragma warning disable DF0010 // Should not be disposed here.
-        var engine = new LamarEngine();
+        var dependoContainer = new LamarDependoContainer();
 #pragma warning restore DF0010
 
-        var serviceProvider = engine.ConfigureServices(serviceRegistry, configuration!);
+        var serviceProvider = dependoContainer.ConfigureServices(serviceRegistry, configuration!);
 
-        // Set engine as the singleton instance
-        EngineContext.Create(engine);
+        // Set dependo container as the singleton instance
+        DependoResolver.Create(dependoContainer);
 
         return serviceProvider;
     }

@@ -7,32 +7,32 @@ using Moq;
 
 namespace Dependo.Tests;
 
-public class LamarEngineTests
+public class LamarDependoContainerTests
 {
     private readonly ServiceRegistry serviceRegistry = [];
     private readonly IContainerBuilder containerBuilder;
 
-    public LamarEngineTests()
+    public LamarDependoContainerTests()
     {
         containerBuilder = new LamarContainerBuilder(serviceRegistry);
     }
 
-    public LamarEngine ConfigureEngine(Action registerServices)
+    public LamarDependoContainer ConfigureDependoContainer(Action registerServices)
     {
         registerServices();
-        var engine = new LamarEngine();
-        engine.ConfigureServices(serviceRegistry, new Mock<IConfigurationRoot>().Object);
-        return engine;
+        var dependoContainer = new LamarDependoContainer();
+        dependoContainer.ConfigureServices(serviceRegistry, new Mock<IConfigurationRoot>().Object);
+        return dependoContainer;
     }
 
     [Fact]
     public void Resolve_RegisteredType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        var service = engine.Resolve<ITestService>();
+        var service = dependoContainer.Resolve<ITestService>();
 
         // Assert
         Assert.NotNull(service);
@@ -42,25 +42,25 @@ public class LamarEngineTests
     [Fact]
     public void Resolve_UnregisteredType_ThrowsException()
     {
-        // Configure the engine with our container
-        using var engine = ConfigureEngine(() => { });
+        // Configure the dependoContainer with our container
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => // Seems like a bug in Lamar.. since ResolveNamed correctly throws LamarMissingRegistrationException
-            engine.Resolve<ITestService>());
+            dependoContainer.Resolve<ITestService>());
 
         //Assert.Throws<LamarMissingRegistrationException>(() =>
-        //    engine.Resolve<ITestService>());
+        //    dependoContainer.Resolve<ITestService>());
     }
 
     [Fact]
     public void Resolve_WithTypeParameter_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton));
 
         // Act
-        object service = engine.Resolve(typeof(ITestService));
+        object service = dependoContainer.Resolve(typeof(ITestService));
 
         // Assert
         Assert.NotNull(service);
@@ -71,10 +71,10 @@ public class LamarEngineTests
     public void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => serviceRegistry.For<ITestService>().Use<TestService>().Named("test-service").Lifetime = ServiceLifetime.Singleton);
+        using var dependoContainer = ConfigureDependoContainer(() => serviceRegistry.For<ITestService>().Use<TestService>().Named("test-service").Lifetime = ServiceLifetime.Singleton);
 
         // Act
-        var service = engine.ResolveNamed<ITestService>("test-service");
+        var service = dependoContainer.ResolveNamed<ITestService>("test-service");
 
         // Assert
         Assert.NotNull(service);
@@ -84,18 +84,18 @@ public class LamarEngineTests
     [Fact]
     public void ResolveNamed_UnregisteredNamedType_ThrowsException()
     {
-        using var engine = ConfigureEngine(() => { });
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act & Assert
         Assert.Throws<LamarMissingRegistrationException>(() =>
-            engine.ResolveNamed<ITestService>("test-service"));
+            dependoContainer.ResolveNamed<ITestService>("test-service"));
     }
 
     [Fact]
     public void ResolveAllNamed_MultipleNamedInstances_ReturnsAllInstances()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
+        using var dependoContainer = ConfigureDependoContainer(() =>
         {
             serviceRegistry.For<ITestService>().Use<TestService>().Named("test-services").Lifetime = ServiceLifetime.Singleton;
             serviceRegistry.For<ITestService>().Use<AnotherTestService>().Named("test-services").Lifetime = ServiceLifetime.Singleton;
@@ -103,17 +103,17 @@ public class LamarEngineTests
 
         // Act & Assert
         Assert.Throws<NotSupportedException>(() =>
-            engine.ResolveAllNamed<ITestService>("test-services"));
+            dependoContainer.ResolveAllNamed<ITestService>("test-services"));
     }
 
     [Fact]
     public void ResolveUnregistered_UnregisteredType_CreatesInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => { });
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act
-        object service = engine.ResolveUnregistered(typeof(ConcreteService));
+        object service = dependoContainer.ResolveUnregistered(typeof(ConcreteService));
 
         // Assert
         Assert.NotNull(service);
@@ -124,10 +124,10 @@ public class LamarEngineTests
     public void TryResolveWithType_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        bool resolved = engine.TryResolve(typeof(ITestService), out object? service);
+        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
         Assert.True(resolved);
@@ -138,11 +138,11 @@ public class LamarEngineTests
     [Fact]
     public void TryResolveWithType_UnregisteredType_ReturnsFalse()
     {
-        // Configure the engine with our container
-        using var engine = ConfigureEngine(() => { });
+        // Configure the dependoContainer with our container
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act
-        bool resolved = engine.TryResolve(typeof(ITestService), out object? service);
+        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
         Assert.False(resolved);
@@ -153,14 +153,14 @@ public class LamarEngineTests
     public void ResolveAll_MultipleRegisteredInstances_ReturnsAllInstances()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
+        using var dependoContainer = ConfigureDependoContainer(() =>
         {
             containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
             containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton);
         });
 
         // Act
-        var services = engine.ResolveAll<ITestService>().ToList();
+        var services = dependoContainer.ResolveAll<ITestService>().ToList();
 
         // Assert
         Assert.Equal(2, services.Count);
@@ -172,10 +172,10 @@ public class LamarEngineTests
     public void TryResolve_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        bool resolved = engine.TryResolve<ITestService>(out var service);
+        bool resolved = dependoContainer.TryResolve<ITestService>(out var service);
 
         // Assert
         Assert.True(resolved);
@@ -186,11 +186,11 @@ public class LamarEngineTests
     [Fact]
     public void TryResolve_UnregisteredType_ReturnsFalse()
     {
-        // Configure the engine with our container
-        using var engine = ConfigureEngine(() => { });
+        // Configure the dependoContainer with our container
+        using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act
-        bool resolved = engine.TryResolve<ITestService>(out var service);
+        bool resolved = dependoContainer.TryResolve<ITestService>(out var service);
 
         // Assert
         Assert.False(resolved);

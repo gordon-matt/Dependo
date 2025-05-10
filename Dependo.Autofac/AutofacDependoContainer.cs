@@ -6,9 +6,9 @@ using Microsoft.Extensions.Configuration;
 namespace Dependo.Autofac;
 
 /// <summary>
-/// Autofac implementation of the Dependo engine
+/// Autofac implementation of the Dependo container
 /// </summary>
-public class AutofacEngine : IEngine, IDisposable
+public class AutofacDependoContainer : IDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -26,7 +26,7 @@ public class AutofacEngine : IEngine, IDisposable
 
     #endregion Properties
 
-    #region IEngine Members
+    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -99,7 +99,7 @@ public class AutofacEngine : IEngine, IDisposable
         return containerManager.TryResolve(serviceType, out instance);
     }
 
-    #endregion IEngine Members
+    #endregion IDependoContainer Members
 
     #region Non-Public Methods
 
@@ -110,8 +110,8 @@ public class AutofacEngine : IEngine, IDisposable
     /// <param name="typeFinder">Type finder</param>
     protected virtual IServiceProvider RegisterDependencies(ContainerBuilder containerBuilder, ITypeFinder typeFinder)
     {
-        // Register engine
-        containerBuilder.RegisterInstance(this).As<IEngine>().SingleInstance();
+        // Register dependo container
+        containerBuilder.RegisterInstance(this).As<IDependoContainer>().SingleInstance();
 
         // Register type finder
         containerBuilder.RegisterInstance(typeFinder).As<ITypeFinder>().SingleInstance();
@@ -190,7 +190,7 @@ public class AutofacEngine : IEngine, IDisposable
     }
 
     /// <summary>
-    /// Dispose engine resources
+    /// Dispose dependo container resources
     /// </summary>
     /// <param name="disposing">Indicates whether the method was called from Dispose()</param>
     protected virtual void Dispose(bool disposing)

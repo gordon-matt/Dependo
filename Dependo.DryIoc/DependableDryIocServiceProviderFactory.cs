@@ -61,15 +61,15 @@ public class DependableDryIocServiceProviderFactory : IServiceProviderFactory<IC
 
         var configuration = provider.GetService<IConfigurationRoot>();
 
-        // Initialize engine
+        // Initialize dependo container
 #pragma warning disable DF0010 // Should not be disposed here.
-        var engine = new DryIocEngine();
+        var dependoContainer = new DryIocDependoContainer();
 #pragma warning restore DF0010
 
-        var serviceProvider = engine.ConfigureServices(container, configuration!);
+        var serviceProvider = dependoContainer.ConfigureServices(container, configuration!);
 
-        // Set engine as the singleton instance
-        EngineContext.Create(engine);
+        // Set dependo container as the singleton instance
+        DependoResolver.Create(dependoContainer);
 
         return serviceProvider;
     }

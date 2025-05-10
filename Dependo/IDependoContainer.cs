@@ -1,9 +1,9 @@
 ﻿namespace Dependo;
 
 /// <summary>
-/// Interface for the Dependo engine that serves as the main entry point for dependency resolution
+/// Interface for the Dependo container that serves as the main entry point for dependency resolution
 /// </summary>
-public interface IEngine
+public interface IDependoContainer
 {
     /// <summary>
     /// Resolve service of specified type

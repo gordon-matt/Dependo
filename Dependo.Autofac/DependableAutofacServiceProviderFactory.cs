@@ -63,16 +63,16 @@ public class DependableAutofacServiceProviderFactory : IServiceProviderFactory<C
 
         var configuration = provider.GetService<IConfigurationRoot>();
 
-        // Initialize engine and create service provider
+        // Initialize dependo container and create service provider
 
 #pragma warning disable DF0010 // Should not be disposed here.
-        var engine = new AutofacEngine();
+        var dependoContainer = new AutofacDependoContainer();
 #pragma warning restore DF0010
 
-        var serviceProvider = engine.ConfigureServices(containerBuilder, configuration!);
+        var serviceProvider = dependoContainer.ConfigureServices(containerBuilder, configuration!);
 
-        // Set engine as the singleton instance
-        EngineContext.Create(engine);
+        // Set dependo container as the singleton instance
+        DependoResolver.Create(dependoContainer);
 
         return serviceProvider;
     }
