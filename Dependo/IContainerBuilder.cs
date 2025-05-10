@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
+// TODO: Add RegisterNamed
+
 namespace Dependo;
 
 /// <summary>
