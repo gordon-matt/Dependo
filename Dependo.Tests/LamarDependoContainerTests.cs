@@ -71,7 +71,8 @@ public class LamarDependoContainerTests
     public void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() => serviceRegistry.For<ITestService>().Use<TestService>().Named("test-service").Lifetime = ServiceLifetime.Singleton);
+        using var dependoContainer = ConfigureDependoContainer(() => 
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-service"));
 
         // Act
         var service = dependoContainer.ResolveNamed<ITestService>("test-service");
@@ -97,13 +98,59 @@ public class LamarDependoContainerTests
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() =>
         {
-            serviceRegistry.For<ITestService>().Use<TestService>().Named("test-services").Lifetime = ServiceLifetime.Singleton;
-            serviceRegistry.For<ITestService>().Use<AnotherTestService>().Named("test-services").Lifetime = ServiceLifetime.Singleton;
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
         });
 
         // Act & Assert
         Assert.Throws<NotSupportedException>(() =>
             dependoContainer.ResolveAllNamed<ITestService>("test-services"));
+    }
+
+    [Fact]
+    public void Register_WithName_RegistersNamedService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() => 
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "named-service"));
+
+        // Act
+        var service = dependoContainer.ResolveNamed<ITestService>("named-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
+
+    [Fact]
+    public void RegisterSelf_WithName_RegistersNamedService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() => 
+            containerBuilder.RegisterSelf<TestService>(ServiceLifetime.Singleton, "named-service"));
+
+        // Act
+        var service = dependoContainer.ResolveNamed<TestService>("named-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
+
+    [Fact]
+    public void RegisterInstance_WithName_RegistersNamedInstance()
+    {
+        // Arrange
+        var instance = new TestService();
+        using var dependoContainer = ConfigureDependoContainer(() => 
+            containerBuilder.RegisterInstance<ITestService>(instance, "named-instance"));
+
+        // Act
+        var service = dependoContainer.ResolveNamed<ITestService>("named-instance");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Same(instance, service);
     }
 
     [Fact]
