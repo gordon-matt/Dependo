@@ -12,7 +12,6 @@ namespace Dependo.Lamar;
 /// </remarks>
 public class LamarContainerBuilder : IContainerBuilder
 {
-
     /// <summary>
     /// Initializes a new instance of the LamarContainerBuilder class
     /// </summary>

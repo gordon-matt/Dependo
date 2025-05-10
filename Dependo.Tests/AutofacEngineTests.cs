@@ -2,24 +2,37 @@ using Autofac;
 using Autofac.Core.Registration;
 using Dependo.Autofac;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace Dependo.Tests;
 
 public class AutofacEngineTests
 {
-    private readonly IConfigurationRoot configuration = new Mock<IConfigurationRoot>().Object;
-    private readonly ContainerBuilder containerBuilder = new();
-    private readonly AutofacEngine engine = new AutofacEngine();
+    private readonly ContainerBuilder autofacContainerBuilder = new();
+    private readonly IContainerBuilder containerBuilder;
+
+    public AutofacEngineTests()
+    {
+        containerBuilder = new AutofacContainerBuilder(autofacContainerBuilder);
+    }
+
+    public AutofacEngine ConfigureEngine(Action registerServices)
+    {
+        registerServices();
+        var engine = new AutofacEngine();
+        engine.ConfigureServices(autofacContainerBuilder, new Mock<IConfigurationRoot>().Object);
+        return engine;
+    }
 
     [Fact]
     public void Resolve_RegisteredType_ReturnsInstance()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().As<ITestService>().SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
+        });
 
         // Act
         var service = engine.Resolve<ITestService>();
@@ -33,7 +46,7 @@ public class AutofacEngineTests
     public void Resolve_UnregisteredType_ThrowsException()
     {
         // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() => { });
 
         // Act & Assert
         Assert.Throws<ComponentNotRegisteredException>(() =>
@@ -44,10 +57,10 @@ public class AutofacEngineTests
     public void Resolve_WithTypeParameter_ReturnsInstance()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().As<ITestService>().SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton);
+        });
 
         // Act
         var service = engine.Resolve(typeof(ITestService));
@@ -61,10 +74,10 @@ public class AutofacEngineTests
     public void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().Named<ITestService>("test-service").SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            autofacContainerBuilder.RegisterType<TestService>().Named<ITestService>("test-service").SingleInstance();
+        });
 
         // Act
         var service = engine.ResolveNamed<ITestService>("test-service");
@@ -77,9 +90,7 @@ public class AutofacEngineTests
     [Fact]
     public void ResolveNamed_UnregisteredNamedType_ThrowsException()
     {
-        // Arrange
-        engine.ConfigureServices(containerBuilder, configuration);
-
+        using var engine = ConfigureEngine(() => { });
         // Act & Assert
         Assert.Throws<ComponentNotRegisteredException>(() =>
             engine.ResolveNamed<ITestService>("test-service"));
@@ -89,11 +100,11 @@ public class AutofacEngineTests
     public void ResolveAllNamed_MultipleNamedInstances_ReturnsAllInstances()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().Named<ITestService>("test-services").SingleInstance();
-        containerBuilder.RegisterType<AnotherTestService>().Named<ITestService>("test-services").SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            autofacContainerBuilder.RegisterType<TestService>().Named<ITestService>("test-services").SingleInstance();
+            autofacContainerBuilder.RegisterType<AnotherTestService>().Named<ITestService>("test-services").SingleInstance();
+        });
 
         // Act
         var services = engine.ResolveAllNamed<ITestService>("test-services").ToList();
@@ -108,7 +119,7 @@ public class AutofacEngineTests
     public void ResolveUnregistered_UnregisteredType_CreatesInstance()
     {
         // Arrange
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() => { });
 
         // Act
         var service = engine.ResolveUnregistered(typeof(ConcreteService));
@@ -122,10 +133,10 @@ public class AutofacEngineTests
     public void TryResolveWithType_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().As<ITestService>().SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
+        });
 
         // Act
         bool resolved = engine.TryResolve(typeof(ITestService), out var service);
@@ -140,7 +151,7 @@ public class AutofacEngineTests
     public void TryResolveWithType_UnregisteredType_ReturnsFalse()
     {
         // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() => { });
 
         // Act
         bool resolved = engine.TryResolve(typeof(ITestService), out var service);
@@ -154,11 +165,11 @@ public class AutofacEngineTests
     public void ResolveAll_MultipleRegisteredInstances_ReturnsAllInstances()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().As<ITestService>().SingleInstance();
-        containerBuilder.RegisterType<AnotherTestService>().As<ITestService>().SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
+            containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton);
+        });
 
         // Act
         var services = engine.ResolveAll<ITestService>().ToList();
@@ -173,10 +184,10 @@ public class AutofacEngineTests
     public void TryResolve_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        containerBuilder.RegisterType<TestService>().As<ITestService>().SingleInstance();
-
-        // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
+        });
 
         // Act
         bool resolved = engine.TryResolve<ITestService>(out var service);
@@ -191,7 +202,7 @@ public class AutofacEngineTests
     public void TryResolve_UnregisteredType_ReturnsFalse()
     {
         // Configure the engine with our container
-        engine.ConfigureServices(containerBuilder, configuration);
+        using var engine = ConfigureEngine(() => { });
 
         // Act
         bool resolved = engine.TryResolve<ITestService>(out var service);
