@@ -27,45 +27,66 @@ public class LamarContainerBuilder : IContainerBuilder
     public ServiceRegistry NativeRegistry { get; }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
     {
-        NativeRegistry.For(serviceType).Use(implementationType).Lifetime = GetLifetime(lifetime);
+        var registration = NativeRegistry.For(serviceType).Use(implementationType);
+        registration.Lifetime = GetLifetime(lifetime);
+        if (!string.IsNullOrEmpty(name))
+        {
+            registration.Named(name);
+        }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
         where TService : class
         where TImplementation : class, TService
     {
-        NativeRegistry.For<TService>().Use<TImplementation>().Lifetime = GetLifetime(lifetime);
+        var registration = NativeRegistry.For<TService>().Use<TImplementation>();
+        registration.Lifetime = GetLifetime(lifetime);
+        if (!string.IsNullOrEmpty(name))
+        {
+            registration.Named(name);
+        }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
         where TImplementation : class
     {
-        NativeRegistry.For<TImplementation>().Use<TImplementation>().Lifetime = GetLifetime(lifetime);
+        var registration = NativeRegistry.For<TImplementation>().Use<TImplementation>();
+        registration.Lifetime = GetLifetime(lifetime);
+        if (!string.IsNullOrEmpty(name))
+        {
+            registration.Named(name);
+        }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance<TService>(TService instance)
+    public IContainerBuilder RegisterInstance<TService>(TService instance, string? name = null)
         where TService : class
     {
-        NativeRegistry.For<TService>().Use(instance);
+        var registration = NativeRegistry.For<TService>().Use(instance);
+        if (!string.IsNullOrEmpty(name))
+        {
+            registration.Named(name);
+        }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance(Type serviceType, object instance)
+    public IContainerBuilder RegisterInstance(Type serviceType, object instance, string? name = null)
     {
-        // In a real implementation, this would use Lamar's registration API
-        // Example: registry.For(serviceType).Use(instance).Singleton();
-        Console.WriteLine($"Registering instance of {serviceType.Name}");
+        var registration = NativeRegistry.For(serviceType).Use(instance.GetType());
+        if (!string.IsNullOrEmpty(name))
+        {
+            registration.Named(name);
+        }
         return this;
     }
 
-    private static ServiceLifetime GetLifetime(ServiceLifetime lifetime) => lifetime;
+    private ServiceLifetime GetLifetime(ServiceLifetime lifetime) => lifetime;
 }
