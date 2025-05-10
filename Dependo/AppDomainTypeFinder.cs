@@ -2,16 +2,14 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Dependo.Autofac;
+namespace Dependo;
 
 /// <summary>
 /// A class that finds types needed by Dependo by loading assemblies in the
 /// currently executing AppDomain.
 /// </summary>
-internal class AppDomainTypeFinder : ITypeFinder
+public class AppDomainTypeFinder : ITypeFinder
 {
-    private readonly bool ignoreReflectionErrors = true;
-
     /// <summary>The app domain to look for types in.</summary>
     public virtual AppDomain App => AppDomain.CurrentDomain;
 
@@ -75,13 +73,13 @@ internal class AppDomainTypeFinder : ITypeFinder
                 {
                     types = assembly.GetTypes();
                 }
-                catch
+                catch (ReflectionTypeLoadException ex)
                 {
-                    //Entity Framework 6 doesn't allow getting types (throws an exception)
-                    if (!ignoreReflectionErrors)
-                    {
-                        throw;
-                    }
+                    // Get types that could be loaded
+                    types = ex.Types
+                        .Where(t => t != null)
+                        .Select(x => x!)
+                        .ToArray();
                 }
 
                 if (types == null)
@@ -91,22 +89,15 @@ internal class AppDomainTypeFinder : ITypeFinder
 
                 foreach (var type in types)
                 {
+                    if (type.IsInterface || type.IsAbstract)
+                    {
+                        continue;
+                    }
+
                     if (assignTypeFrom.IsAssignableFrom(type) ||
                         (assignTypeFrom.IsGenericTypeDefinition && DoesTypeImplementOpenGeneric(type, assignTypeFrom)))
                     {
-                        if (type.IsInterface)
-                        {
-                            continue;
-                        }
-
-                        if (onlyConcreteClasses)
-                        {
-                            if (type.IsClass && !type.IsAbstract)
-                            {
-                                result.Add(type);
-                            }
-                        }
-                        else
+                        if (!onlyConcreteClasses || type.IsClass)
                         {
                             result.Add(type);
                         }
@@ -116,8 +107,8 @@ internal class AppDomainTypeFinder : ITypeFinder
         }
         catch (ReflectionTypeLoadException ex)
         {
-            var msg = string.Join(Environment.NewLine,
-                ex.LoaderExceptions.Where(e => e != null).Select(e => e.Message));
+            string msg = string.Join(Environment.NewLine,
+                ex.LoaderExceptions.Where(e => e != null).Select(e => e!.Message));
 
             var fail = new Exception(msg, ex);
             Debug.WriteLine(fail.Message, fail);
@@ -203,15 +194,14 @@ internal class AppDomainTypeFinder : ITypeFinder
         try
         {
             var genericTypeDefinition = openGeneric.GetGenericTypeDefinition();
-            foreach (var implementedInterface in type.FindInterfaces((objType, objCriteria) => true, null))
+            foreach (var implementedInterface in type.GetInterfaces())
             {
                 if (!implementedInterface.IsGenericType)
                 {
                     continue;
                 }
 
-                var isMatch = genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
-                return isMatch;
+                return genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
             }
             return false;
         }
