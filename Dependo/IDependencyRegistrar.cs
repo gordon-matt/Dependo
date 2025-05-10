@@ -17,3 +17,8 @@ public interface IDependencyRegistrar
     /// </summary>
     int Order { get; }
 }
+
+/// <summary>
+/// Adapter interface for dependency registrars (to use DI framework-specific features)
+/// </summary>
+public interface IDependencyRegistrarAdapter : IDependencyRegistrar;
