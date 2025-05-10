@@ -1,4 +1,5 @@
 using Dependo.Autofac;
+using Dependo.Lamar;
 
 namespace Dependo.Demo;
 
@@ -14,4 +15,5 @@ public class Program
                 webBuilder.UseStartup<Startup>();
             })
             .UseServiceProviderFactory(new DependableAutofacServiceProviderFactory());
+            //.UseServiceProviderFactory(new DependableLamarServiceProviderFactory());
 }
