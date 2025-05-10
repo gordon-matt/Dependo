@@ -14,6 +14,7 @@ public static class EngineFactory
     public static IEngine CreateEngine(string containerType) => containerType.ToLowerInvariant() switch
     {
         "autofac" => CreateAutofacEngine(),
+        "dryioc" => CreateDryIocEngine(),
         "lamar" => CreateLamarEngine(),
         _ => throw new ArgumentException($"Unsupported container type: {containerType}", nameof(containerType))
     };
@@ -24,6 +25,15 @@ public static class EngineFactory
         var engineType = Type.GetType("Dependo.Autofac.AutofacEngine, Dependo.Autofac");
         return engineType == null
             ? throw new InvalidOperationException("Dependo.Autofac assembly is not available")
+            : (IEngine)Activator.CreateInstance(engineType)!;
+    }
+
+    private static IEngine CreateDryIocEngine()
+    {
+        // Create DryIoc engine dynamically to avoid reference coupling
+        var engineType = Type.GetType("Dependo.DryIoc.DryIocEngine, Dependo.DryIoc");
+        return engineType == null
+            ? throw new InvalidOperationException("Dependo.DryIoc assembly is not available")
             : (IEngine)Activator.CreateInstance(engineType)!;
     }
 

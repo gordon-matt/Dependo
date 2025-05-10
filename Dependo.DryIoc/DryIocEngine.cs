@@ -1,8 +1,6 @@
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.DryIoc;
 
@@ -112,17 +110,18 @@ public class DryIocEngine : IEngine, IDisposable
     /// <inheritdoc />
     public IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException("DryIOC does not support multiple named registrations of the same type. When registering, an exception is thrown.");
-        //_container == null
-        //    ? throw new InvalidOperationException("Container is not initialized")
-        //    : _container.ResolveMany<T>(serviceKey: name);
+
+    //_container == null
+    //    ? throw new InvalidOperationException("Container is not initialized")
+    //    : _container.ResolveMany<T>(serviceKey: name);
 
     /// <inheritdoc />
     public virtual object ResolveUnregistered(Type type) =>
         throw new NotSupportedException("DryIOC does not support resolving unregistered services.");
-        
-        //_container == null
-        //    ? throw new InvalidOperationException("Container is not initialized")
-        //    : _container.Resolve(type, IfUnresolved.Throw);
+
+    //_container == null
+    //    ? throw new InvalidOperationException("Container is not initialized")
+    //    : _container.Resolve(type, IfUnresolved.Throw);
 
     /// <inheritdoc />
     public bool TryResolve<T>(out T instance) where T : class
