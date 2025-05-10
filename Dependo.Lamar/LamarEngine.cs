@@ -81,9 +81,9 @@ public class LamarEngine : IEngine, IDisposable
     public virtual IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
 
     /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) => _container == null
-        ? throw new InvalidOperationException("Container is not initialized")
-        : _container.GetAllInstances<T>().Where(x => x!.GetType().Name.Contains(name));
+    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
+        throw new NotSupportedException(
+            "Lamar does not support multiple named registrations of the same type. When registering, they get overriden. Call ResolveNamed<T> instead");
 
     /// <inheritdoc />
     public virtual object ResolveUnregistered(Type type) =>
