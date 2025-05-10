@@ -9,7 +9,6 @@ namespace Dependo.Autofac;
 /// </summary>
 public class AutofacContainerBuilder : IContainerBuilder
 {
-
     /// <summary>
     /// Initializes a new instance of the AutofacContainerBuilder class
     /// </summary>

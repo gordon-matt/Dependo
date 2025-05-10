@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.Autofac;
 
@@ -129,7 +127,7 @@ public class AutofacEngine : IEngine, IDisposable
         var autofacRegistrars = typeFinder.FindClassesOfType<IAutofacDependencyRegistrar>();
 
         //var autofacRegistrars = typeFinder.FindClassesOfType<IAutofacDependencyRegistrar>()
-        //    .Where(x => !typeof(IDependencyRegistrar).IsAssignableFrom(x) || 
+        //    .Where(x => !typeof(IDependencyRegistrar).IsAssignableFrom(x) ||
         //        x.Name != "AutofacDependencyRegistrarAdapter");
 
         // Create and sort instances of dependency registrars
