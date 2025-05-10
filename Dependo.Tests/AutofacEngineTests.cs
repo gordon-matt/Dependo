@@ -29,10 +29,7 @@ public class AutofacEngineTests
     public void Resolve_RegisteredType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
-        {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
-        });
+        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
         var service = engine.Resolve<ITestService>();
@@ -57,13 +54,10 @@ public class AutofacEngineTests
     public void Resolve_WithTypeParameter_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
-        {
-            containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton);
-        });
+        using var engine = ConfigureEngine(() => containerBuilder.Register(typeof(ITestService), typeof(TestService), ServiceLifetime.Singleton));
 
         // Act
-        var service = engine.Resolve(typeof(ITestService));
+        object service = engine.Resolve(typeof(ITestService));
 
         // Assert
         Assert.NotNull(service);
@@ -74,10 +68,7 @@ public class AutofacEngineTests
     public void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
-        {
-            autofacContainerBuilder.RegisterType<TestService>().Named<ITestService>("test-service").SingleInstance();
-        });
+        using var engine = ConfigureEngine(() => autofacContainerBuilder.RegisterType<TestService>().Named<ITestService>("test-service").SingleInstance());
 
         // Act
         var service = engine.ResolveNamed<ITestService>("test-service");
@@ -122,7 +113,7 @@ public class AutofacEngineTests
         using var engine = ConfigureEngine(() => { });
 
         // Act
-        var service = engine.ResolveUnregistered(typeof(ConcreteService));
+        object service = engine.ResolveUnregistered(typeof(ConcreteService));
 
         // Assert
         Assert.NotNull(service);
@@ -133,13 +124,10 @@ public class AutofacEngineTests
     public void TryResolveWithType_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
-        {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
-        });
+        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        bool resolved = engine.TryResolve(typeof(ITestService), out var service);
+        bool resolved = engine.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
         Assert.True(resolved);
@@ -154,7 +142,7 @@ public class AutofacEngineTests
         using var engine = ConfigureEngine(() => { });
 
         // Act
-        bool resolved = engine.TryResolve(typeof(ITestService), out var service);
+        bool resolved = engine.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
         Assert.False(resolved);
@@ -184,10 +172,7 @@ public class AutofacEngineTests
     public void TryResolve_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var engine = ConfigureEngine(() =>
-        {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
-        });
+        using var engine = ConfigureEngine(() => containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
         bool resolved = engine.TryResolve<ITestService>(out var service);

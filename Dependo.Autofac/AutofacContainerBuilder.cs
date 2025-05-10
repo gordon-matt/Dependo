@@ -9,7 +9,6 @@ namespace Dependo.Autofac;
 /// </summary>
 public class AutofacContainerBuilder : IContainerBuilder
 {
-    private readonly ContainerBuilder _containerBuilder;
 
     /// <summary>
     /// Initializes a new instance of the AutofacContainerBuilder class
@@ -17,18 +16,18 @@ public class AutofacContainerBuilder : IContainerBuilder
     /// <param name="containerBuilder">Autofac container builder</param>
     public AutofacContainerBuilder(ContainerBuilder containerBuilder)
     {
-        _containerBuilder = containerBuilder;
+        NativeBuilder = containerBuilder;
     }
 
     /// <summary>
     /// Gets the native Autofac container builder
     /// </summary>
-    public ContainerBuilder NativeBuilder => _containerBuilder;
+    public ContainerBuilder NativeBuilder { get; }
 
     /// <inheritdoc/>
     public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        var registration = _containerBuilder.RegisterType(implementationType).As(serviceType);
+        var registration = NativeBuilder.RegisterType(implementationType).As(serviceType);
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -38,7 +37,7 @@ public class AutofacContainerBuilder : IContainerBuilder
         where TService : class
         where TImplementation : class, TService
     {
-        var registration = _containerBuilder.RegisterType<TImplementation>().As<TService>();
+        var registration = NativeBuilder.RegisterType<TImplementation>().As<TService>();
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -47,7 +46,7 @@ public class AutofacContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TImplementation : class
     {
-        var registration = _containerBuilder.RegisterType<TImplementation>().AsSelf();
+        var registration = NativeBuilder.RegisterType<TImplementation>().AsSelf();
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -56,14 +55,14 @@ public class AutofacContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterInstance<TService>(TService instance)
         where TService : class
     {
-        _containerBuilder.RegisterInstance(instance).As<TService>().SingleInstance();
+        NativeBuilder.RegisterInstance(instance).As<TService>().SingleInstance();
         return this;
     }
 
     /// <inheritdoc/>
     public IContainerBuilder RegisterInstance(Type serviceType, object instance)
     {
-        _containerBuilder.RegisterInstance(instance).As(serviceType).SingleInstance();
+        NativeBuilder.RegisterInstance(instance).As(serviceType).SingleInstance();
         return this;
     }
 

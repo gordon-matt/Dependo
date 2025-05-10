@@ -28,7 +28,7 @@ public class AutofacDependencyRegistrarAdapter : IDependencyRegistrarAdapter
             _autofacRegistrar.Register(autofacBuilder.NativeBuilder, typeFinder);
         }
     }
-    
+
     /// <summary>
     /// Creates an instance of the AutofacDependencyRegistrarAdapter from a Type representing an IAutofacDependencyRegistrar
     /// </summary>
@@ -42,10 +42,10 @@ public class AutofacDependencyRegistrarAdapter : IDependencyRegistrarAdapter
         {
             throw new ArgumentException($"Type {autofacRegistrarType.Name} must implement IAutofacDependencyRegistrar", nameof(autofacRegistrarType));
         }
-        
+
         // Create an instance of the IAutofacDependencyRegistrar
         var autofacRegistrar = (IAutofacDependencyRegistrar)Activator.CreateInstance(autofacRegistrarType)!;
-        
+
         // Create and return the adapter
         return new AutofacDependencyRegistrarAdapter(autofacRegistrar);
     }
