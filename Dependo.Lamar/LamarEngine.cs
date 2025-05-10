@@ -1,3 +1,5 @@
+using Lamar;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,15 +8,11 @@ namespace Dependo.Lamar;
 /// <summary>
 /// Lamar implementation of the Dependo engine
 /// </summary>
-/// <remarks>
-/// This is a stub class to demonstrate the concept.
-/// In a real implementation, you would use actual Lamar types and methods.
-/// </remarks>
 public class LamarEngine : IEngine, IDisposable
 {
     #region Private Members
 
-    private readonly object? _container;
+    private Container? _container;
     private bool _disposed;
 
     #endregion Private Members
@@ -42,41 +40,54 @@ public class LamarEngine : IEngine, IDisposable
         var typeFinder = new WebAppTypeFinder();
 
         // Register dependencies
-        RegisterDependencies(services, typeFinder);
-
-        // Build the container (Lamar Container in a real implementation)
-        // _container = new Container(services);
-        // ServiceProvider = _container;
-
-        // Using default service provider for this stub
-
-#pragma warning disable DF0023 // Should not be disposed here.
-        ServiceProvider = services.BuildServiceProvider();
-#pragma warning restore DF0023
+        _container = RegisterDependencies(services, typeFinder) as Container;
+        ServiceProvider = _container!;
 
         return ServiceProvider;
     }
 
-    /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class => ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+    //public virtual IServiceProvider ConfigureServices(IServiceCollection services, IConfigurationRoot configuration)
+    //{
+    //    // Find startup configurations provided by other assemblies
+    //    var typeFinder = new WebAppTypeFinder();
+
+    //    // Register dependencies
+    //    RegisterDependencies(services, typeFinder);
+
+    //    // Build the container
+    //    _container = new Container(services);
+    //    ServiceProvider = _container;
+
+    //    return ServiceProvider;
+    //}
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class => throw new NotImplementedException("Resolving with constructor arguments not implemented in stub");
+    public virtual T Resolve<T>() where T : class =>
+        ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
-    public virtual object Resolve(Type type) => ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
+        throw new NotSupportedException("Lamar does not support passing constructor arguments");
 
     /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class => throw new NotImplementedException("Named resolution not implemented in stub");
+    public virtual object Resolve(Type type) =>
+        ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+
+    /// <inheritdoc />
+    public T ResolveNamed<T>(string name) where T : class =>
+        _container == null ? throw new InvalidOperationException("Container is not initialized") : _container.GetInstance<T>(name);
 
     /// <inheritdoc />
     public virtual IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
 
     /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) => throw new NotImplementedException("Named resolution not implemented in stub");
+    public IEnumerable<T> ResolveAllNamed<T>(string name) => _container == null
+        ? throw new InvalidOperationException("Container is not initialized")
+        : _container.GetAllInstances<T>().Where(x => x!.GetType().Name.Contains(name));
 
     /// <inheritdoc />
-    public virtual object ResolveUnregistered(Type type) => throw new NotImplementedException("Unregistered resolution not implemented in stub");
+    public virtual object ResolveUnregistered(Type type) =>
+        _container == null ? throw new InvalidOperationException("Container is not initialized") : _container.GetInstance(type);
 
     /// <inheritdoc />
     public bool TryResolve<T>(out T instance) where T : class
@@ -97,6 +108,17 @@ public class LamarEngine : IEngine, IDisposable
     #region Non-Public Methods
 
     /// <summary>
+    /// Get IServiceProvider
+    /// </summary>
+    /// <returns>IServiceProvider</returns>
+    protected virtual IServiceProvider GetServiceProvider()
+    {
+        var httpContextAccessor = ServiceProvider.GetService<IHttpContextAccessor>();
+        var context = httpContextAccessor?.HttpContext;
+        return context?.RequestServices ?? ServiceProvider;
+    }
+
+    /// <summary>
     /// Register dependencies
     /// </summary>
     /// <param name="services">Service collection</param>
@@ -109,19 +131,24 @@ public class LamarEngine : IEngine, IDisposable
         // Register type finder
         services.AddSingleton(typeFinder);
 
-        // In a real implementation, a LamarRegistry would be created here
-        // var registry = new ServiceRegistry();
-        // registry.AddRange(services);
+        // Create a Lamar registry
+        var registry = new ServiceRegistry();
+        registry.AddRange(services);
 
         // Create a Lamar container builder abstraction
-        var builder = new LamarContainerBuilder(new object());
+        var builder = new LamarContainerBuilder(registry);
 
         // Find dependency registrars provided by other assemblies
-        var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>();
+        var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>()
+            .Where(x => !typeof(IDependencyRegistrarAdapter).IsAssignableFrom(x));
+
+        // Find Lamar-specific registrars to create adapters for them
+        var lamarRegistrars = typeFinder.FindClassesOfType<ILamarDependencyRegistrar>();
 
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
+            .Concat(lamarRegistrars.Select(x => LamarDependencyRegistrarAdapter.CreateFromType(x)))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies
@@ -130,8 +157,9 @@ public class LamarEngine : IEngine, IDisposable
             dependencyRegistrar.Register(builder, typeFinder);
         }
 
-        // Create service provider (for this stub we're using the default)
-        return services.BuildServiceProvider();
+        // Create container
+        var container = new Container(registry);
+        return container;
     }
 
     #endregion Non-Public Methods
@@ -158,8 +186,7 @@ public class LamarEngine : IEngine, IDisposable
 
         if (disposing)
         {
-            // In a real implementation, dispose the container
-            (_container as IDisposable)?.Dispose();
+            _container?.Dispose();
         }
 
         _disposed = true;

@@ -1,3 +1,4 @@
+using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.Lamar;
@@ -11,26 +12,25 @@ namespace Dependo.Lamar;
 /// </remarks>
 public class LamarContainerBuilder : IContainerBuilder
 {
+
     /// <summary>
     /// Initializes a new instance of the LamarContainerBuilder class
     /// </summary>
-    /// <param name="registry">Lamar registry</param>
-    public LamarContainerBuilder(object registry)
+    /// <param name="registry">Lamar service registry</param>
+    public LamarContainerBuilder(ServiceRegistry registry)
     {
         NativeRegistry = registry;
     }
 
     /// <summary>
-    /// Gets the native Lamar registry
+    /// Gets the native Lamar service registry
     /// </summary>
-    public object NativeRegistry { get; }
+    public ServiceRegistry NativeRegistry { get; }
 
     /// <inheritdoc/>
     public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        // In a real implementation, this would use Lamar's registration API
-        // Example: registry.For(serviceType).Use(implementationType).Lifetime(MapLifetime(lifetime));
-        Console.WriteLine($"Registering {implementationType.Name} as {serviceType.Name} with lifetime {lifetime}");
+        NativeRegistry.For(serviceType).Use(implementationType).Lifetime = GetLifetime(lifetime);
         return this;
     }
 
@@ -39,9 +39,7 @@ public class LamarContainerBuilder : IContainerBuilder
         where TService : class
         where TImplementation : class, TService
     {
-        // In a real implementation, this would use Lamar's registration API
-        // Example: registry.For<TService>().Use<TImplementation>().Lifetime(MapLifetime(lifetime));
-        Console.WriteLine($"Registering {typeof(TImplementation).Name} as {typeof(TService).Name} with lifetime {lifetime}");
+        NativeRegistry.For<TService>().Use<TImplementation>().Lifetime = GetLifetime(lifetime);
         return this;
     }
 
@@ -49,9 +47,7 @@ public class LamarContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TImplementation : class
     {
-        // In a real implementation, this would use Lamar's registration API
-        // Example: registry.ForSelf<TImplementation>().Use<TImplementation>().Lifetime(MapLifetime(lifetime));
-        Console.WriteLine($"Registering {typeof(TImplementation).Name} as self with lifetime {lifetime}");
+        NativeRegistry.For<TImplementation>().Use<TImplementation>().Lifetime = GetLifetime(lifetime);
         return this;
     }
 
@@ -59,9 +55,7 @@ public class LamarContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterInstance<TService>(TService instance)
         where TService : class
     {
-        // In a real implementation, this would use Lamar's registration API
-        // Example: registry.For<TService>().Use(instance).Singleton();
-        Console.WriteLine($"Registering instance of {typeof(TService).Name}");
+        NativeRegistry.For<TService>().Use(instance);
         return this;
     }
 
@@ -74,12 +68,5 @@ public class LamarContainerBuilder : IContainerBuilder
         return this;
     }
 
-    // In a real implementation, this would map Dependo.Dependency.ServiceLifetime to Lamar's lifetime types
-    private string MapLifetime(ServiceLifetime lifetime) => lifetime switch
-    {
-        ServiceLifetime.Singleton => "Singleton",
-        ServiceLifetime.Scoped => "Scoped",
-        ServiceLifetime.Transient => "Transient",
-        _ => throw new ArgumentOutOfRangeException(nameof(lifetime))
-    };
+    private static ServiceLifetime GetLifetime(ServiceLifetime lifetime) => lifetime;
 }
