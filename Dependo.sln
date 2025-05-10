@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dependo.Demo", "Dependo.Dem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependo.Lamar", "Dependo.Lamar\Dependo.Lamar.csproj", "{0C410755-54EA-7409-C854-6A6A27DCCA1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependo.Tests", "Dependo.Tests\Dependo.Tests.csproj", "{BBE5F606-E09C-4C42-8DE8-D73D38DD8179}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{0C410755-54EA-7409-C854-6A6A27DCCA1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C410755-54EA-7409-C854-6A6A27DCCA1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C410755-54EA-7409-C854-6A6A27DCCA1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE5F606-E09C-4C42-8DE8-D73D38DD8179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE5F606-E09C-4C42-8DE8-D73D38DD8179}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBE5F606-E09C-4C42-8DE8-D73D38DD8179}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBE5F606-E09C-4C42-8DE8-D73D38DD8179}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

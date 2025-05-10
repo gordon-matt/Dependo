@@ -134,15 +134,31 @@ public class AutofacEngine : IEngine, IDisposable
 
         // Find dependency registrars provided by other assemblies
         var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>()
-            .Where(x => x.Name != "AutofacDependencyRegistrarAdapter"); // Not working yet.. can't use Activator.CreateInstance here
+            .Where(x => !typeof(IDependencyRegistrarAdapter).IsAssignableFrom(x));
+
+        // Find Autofac-specific registrars to create adapters for them
+        var autofacRegistrars = typeFinder.FindClassesOfType<IAutofacDependencyRegistrar>();
+
+        //var autofacRegistrars = typeFinder.FindClassesOfType<IAutofacDependencyRegistrar>()
+        //    .Where(x => !typeof(IDependencyRegistrar).IsAssignableFrom(x) || 
+        //        x.Name != "AutofacDependencyRegistrarAdapter");
 
         // Create and sort instances of dependency registrars
-        var instances = dependencyRegistrars
-            .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
-            .OrderBy(x => x.Order);
+        var instances = new List<IDependencyRegistrar>();
+            
+        // Add regular dependency registrars
+        instances.AddRange(dependencyRegistrars
+            .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!));
+            
+        // Add Autofac-specific registrars through the adapter
+        instances.AddRange(autofacRegistrars
+            .Select(x => (IDependencyRegistrar)AutofacDependencyRegistrarAdapter.CreateFromType(x)));
+            
+        // Sort by order
+        var orderedInstances = instances.OrderBy(x => x.Order);
 
         // Register all provided dependencies
-        foreach (var dependencyRegistrar in instances)
+        foreach (var dependencyRegistrar in orderedInstances)
         {
             dependencyRegistrar.Register(builder, typeFinder);
         }

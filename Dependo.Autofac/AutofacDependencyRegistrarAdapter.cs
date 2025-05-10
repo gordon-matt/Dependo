@@ -3,7 +3,7 @@ namespace Dependo.Autofac;
 /// <summary>
 /// Adapter class to bridge the Autofac-specific IDependencyRegistrar with the framework-agnostic interface.
 /// </summary>
-public class AutofacDependencyRegistrarAdapter : IDependencyRegistrar
+public class AutofacDependencyRegistrarAdapter : IDependencyRegistrarAdapter
 {
     private readonly IAutofacDependencyRegistrar _autofacRegistrar;
 
@@ -27,5 +27,26 @@ public class AutofacDependencyRegistrarAdapter : IDependencyRegistrar
         {
             _autofacRegistrar.Register(autofacBuilder.NativeBuilder, typeFinder);
         }
+    }
+    
+    /// <summary>
+    /// Creates an instance of the AutofacDependencyRegistrarAdapter from a Type representing an IAutofacDependencyRegistrar
+    /// </summary>
+    /// <param name="autofacRegistrarType">Type that implements IAutofacDependencyRegistrar</param>
+    /// <returns>A new instance of AutofacDependencyRegistrarAdapter</returns>
+    /// <exception cref="ArgumentException">Thrown when the provided type doesn't implement IAutofacDependencyRegistrar</exception>
+    /// <exception cref="MissingMethodException">Thrown when the IAutofacDependencyRegistrar type doesn't have a parameterless constructor</exception>
+    public static AutofacDependencyRegistrarAdapter CreateFromType(Type autofacRegistrarType)
+    {
+        if (!typeof(IAutofacDependencyRegistrar).IsAssignableFrom(autofacRegistrarType))
+        {
+            throw new ArgumentException($"Type {autofacRegistrarType.Name} must implement IAutofacDependencyRegistrar", nameof(autofacRegistrarType));
+        }
+        
+        // Create an instance of the IAutofacDependencyRegistrar
+        var autofacRegistrar = (IAutofacDependencyRegistrar)Activator.CreateInstance(autofacRegistrarType)!;
+        
+        // Create and return the adapter
+        return new AutofacDependencyRegistrarAdapter(autofacRegistrar);
     }
 }
