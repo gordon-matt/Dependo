@@ -46,7 +46,6 @@ public class AutofacEngine : IEngine, IDisposable
 
         // Resolve assemblies here to avoid exceptions when rendering views
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-
         return ServiceProvider;
     }
 
@@ -79,26 +78,26 @@ public class AutofacEngine : IEngine, IDisposable
         containerManager?.ResolveUnregistered(type) ?? throw new InvalidOperationException("Container manager is not initialized");
 
     /// <inheritdoc />
-    public bool TryResolve<T>(out T instance) where T : class
+    public bool TryResolve<T>(out T? instance) where T : class
     {
         if (containerManager == null)
         {
             instance = default!;
             return false;
         }
-        
+
         return containerManager.TryResolve(out instance);
     }
 
     /// <inheritdoc />
-    public bool TryResolve(Type serviceType, out object instance)
+    public bool TryResolve(Type serviceType, out object? instance)
     {
         if (containerManager == null)
         {
             instance = default!;
             return false;
         }
-        
+
         return containerManager.TryResolve(serviceType, out instance);
     }
 
@@ -130,8 +129,12 @@ public class AutofacEngine : IEngine, IDisposable
         // Register type finder
         containerBuilder.RegisterInstance(typeFinder).As<ITypeFinder>().SingleInstance();
 
+        // Create an abstraction over the Autofac container builder
+        var builder = new AutofacContainerBuilder(containerBuilder);
+
         // Find dependency registrars provided by other assemblies
-        var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>();
+        var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>()
+            .Where(x => x.Name != "AutofacDependencyRegistrarAdapter"); // Not working yet.. can't use Activator.CreateInstance here
 
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
@@ -141,17 +144,24 @@ public class AutofacEngine : IEngine, IDisposable
         // Register all provided dependencies
         foreach (var dependencyRegistrar in instances)
         {
-            dependencyRegistrar.Register(containerBuilder, typeFinder);
+            dependencyRegistrar.Register(builder, typeFinder);
         }
 
         // Create service provider
+
+#pragma warning disable DF0010 // Should not be disposed here.
         var container = containerBuilder.Build();
+#pragma warning restore DF0010 //
+
+#pragma warning disable DF0022 // Should not be disposed here.
         ServiceProvider = new AutofacServiceProvider(container);
+#pragma warning restore DF0022 //
+
         containerManager = new AutofacContainerManager(container);
         return ServiceProvider;
     }
 
-    private Assembly? CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+    private Assembly? CurrentDomain_AssemblyResolve(object? sender, ResolveEventArgs args)
     {
         // Check for assembly already loaded
         var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);

@@ -1,6 +1,4 @@
-﻿using Autofac;
-
-namespace Dependo.Autofac;
+namespace Dependo;
 
 /// <summary>
 /// Interface for dependency registrars
@@ -10,9 +8,9 @@ public interface IDependencyRegistrar
     /// <summary>
     /// Register services and interfaces
     /// </summary>
-    /// <param name="builder">Container builder</param>
+    /// <param name="builder">Container builder abstraction</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(ContainerBuilder builder, ITypeFinder typeFinder);
+    void Register(IContainerBuilder builder, ITypeFinder typeFinder);
 
     /// <summary>
     /// Gets order of this dependency registrar implementation

@@ -49,8 +49,8 @@ internal class AutofacContainerManager : IDisposable
     public T Resolve<T>(IDictionary<string, object> ctorArgs, string key = "") where T : class
     {
         var ctorParams = ctorArgs.Select(x => new NamedParameter(x.Key, x.Value)).ToArray();
-        return string.IsNullOrEmpty(key) 
-            ? Container.Resolve<T>(ctorParams) 
+        return string.IsNullOrEmpty(key)
+            ? Container.Resolve<T>(ctorParams)
             : Container.ResolveKeyed<T>(key, ctorParams);
     }
 
@@ -67,7 +67,7 @@ internal class AutofacContainerManager : IDisposable
     /// <typeparam name="T">The type to resolve</typeparam>
     /// <param name="key">Optional key for keyed service</param>
     /// <returns>All resolved instances</returns>
-    public IEnumerable<T> ResolveAll<T>(string key = "") => 
+    public IEnumerable<T> ResolveAll<T>(string key = "") =>
         string.IsNullOrEmpty(key)
             ? Container.Resolve<IEnumerable<T>>().ToArray()
             : Container.ResolveKeyed<IEnumerable<T>>(key).ToArray();
@@ -78,7 +78,7 @@ internal class AutofacContainerManager : IDisposable
     /// <typeparam name="T">The type to resolve</typeparam>
     /// <param name="name">The service name</param>
     /// <returns>All resolved named instances</returns>
-    public IEnumerable<T> ResolveAllNamed<T>(string name) => 
+    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
         Container.ResolveKeyed<IEnumerable<T>>(name).ToArray();
 
     /// <summary>
@@ -87,7 +87,7 @@ internal class AutofacContainerManager : IDisposable
     /// <typeparam name="T">The type to resolve</typeparam>
     /// <param name="name">Service name</param>
     /// <returns>The resolved instance</returns>
-    public T ResolveNamed<T>(string name) where T : class => 
+    public T ResolveNamed<T>(string name) where T : class =>
         Container.ResolveNamed<T>(name);
 
     /// <summary>
@@ -95,7 +95,7 @@ internal class AutofacContainerManager : IDisposable
     /// </summary>
     /// <param name="serviceType">Type to resolve</param>
     /// <returns>The resolved instance or null</returns>
-    public object? ResolveOptional(Type serviceType) => 
+    public object? ResolveOptional(Type serviceType) =>
         Container.ResolveOptional(serviceType);
 
     /// <summary>
@@ -103,7 +103,7 @@ internal class AutofacContainerManager : IDisposable
     /// </summary>
     /// <typeparam name="T">The type to resolve</typeparam>
     /// <returns>The resolved instance</returns>
-    public T? ResolveUnregistered<T>() where T : class => 
+    public T? ResolveUnregistered<T>() where T : class =>
         ResolveUnregistered(typeof(T)) as T;
 
     /// <summary>
@@ -144,7 +144,7 @@ internal class AutofacContainerManager : IDisposable
     /// <typeparam name="T">The type to resolve</typeparam>
     /// <param name="instance">The resolved instance</param>
     /// <returns>True if resolved successfully</returns>
-    public bool TryResolve<T>(out T instance) where T : class => 
+    public bool TryResolve<T>(out T? instance) where T : class =>
         Container.TryResolve(out instance);
 
     /// <summary>
@@ -153,7 +153,7 @@ internal class AutofacContainerManager : IDisposable
     /// <param name="serviceType">Type to resolve</param>
     /// <param name="instance">The resolved instance</param>
     /// <returns>True if resolved successfully</returns>
-    public bool TryResolve(Type serviceType, out object instance) => 
+    public bool TryResolve(Type serviceType, out object? instance) =>
         Container.TryResolve(serviceType, out instance);
 
     #region IDisposable Members

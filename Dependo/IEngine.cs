@@ -63,7 +63,7 @@ public interface IEngine
     /// <typeparam name="T">Type of service to resolve</typeparam>
     /// <param name="instance">Resolved service</param>
     /// <returns>True if resolved successfully</returns>
-    bool TryResolve<T>(out T instance) where T : class;
+    bool TryResolve<T>(out T? instance) where T : class;
 
     /// <summary>
     /// Try to resolve service by type
@@ -71,5 +71,5 @@ public interface IEngine
     /// <param name="serviceType">Type of service to resolve</param>
     /// <param name="instance">Resolved service</param>
     /// <returns>True if resolved successfully</returns>
-    bool TryResolve(Type serviceType, out object instance);
+    bool TryResolve(Type serviceType, out object? instance);
 }

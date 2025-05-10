@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+using System.Reflection;
 
-namespace Dependo.Autofac;
+namespace Dependo;
 
 /// <summary>
 /// Interface for classes that can find types in assemblies

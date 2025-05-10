@@ -56,13 +56,21 @@ public class DependableAutofacServiceProviderFactory : IServiceProviderFactory<C
         }
 
         // Build service provider for configuration access
+
+#pragma warning disable DF0010  // Should not be disposed here.
         var provider = services.BuildServiceProvider();
+#pragma warning restore DF0010
+
         var configuration = provider.GetService<IConfigurationRoot>();
 
         // Initialize engine and create service provider
+
+#pragma warning disable DF0010 // Should not be disposed here.
         var engine = new AutofacEngine();
-        var serviceProvider = engine.ConfigureServices(containerBuilder, configuration);
-        
+#pragma warning restore DF0010
+
+        var serviceProvider = engine.ConfigureServices(containerBuilder, configuration!);
+
         // Set engine as the singleton instance
         EngineContext.Create(engine);
 

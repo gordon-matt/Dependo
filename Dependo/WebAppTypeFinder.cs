@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 
-namespace Dependo.Autofac;
+namespace Dependo;
 
 /// <summary>
 /// Provides information about types in the current web application.
 /// Specifically looks at assemblies in the bin folder.
 /// </summary>
-internal class WebAppTypeFinder : AppDomainTypeFinder
+public class WebAppTypeFinder : AppDomainTypeFinder
 {
     private bool binFolderAssembliesLoaded;
 
