@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Lamar;
 
 namespace Dependo.Demo;
 
@@ -50,9 +51,17 @@ public class Startup
         });
     }
 
+    // For Autofac
     public void ConfigureContainer(ContainerBuilder builder)
     {
         // Add extra registrations here, if needed...
         //  But it's better to use IDependencyRegistrar
     }
+
+    //// For Lamar
+    //public void ConfigureContainer(ServiceRegistry builder)
+    //{
+    //    // Add extra registrations here, if needed...
+    //    //  But it's better to use IDependencyRegistrar
+    //}
 }

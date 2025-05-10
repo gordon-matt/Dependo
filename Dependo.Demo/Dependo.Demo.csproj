@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependo.Autofac\Dependo.Autofac.csproj" />
+    <ProjectReference Include="..\Dependo.Lamar\Dependo.Lamar.csproj" />
     <ProjectReference Include="..\Dependo\Dependo.csproj" />
   </ItemGroup>
 </Project>
