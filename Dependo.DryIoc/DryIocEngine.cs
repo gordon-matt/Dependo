@@ -48,8 +48,16 @@ public class DryIocEngine : IEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class =>
-        _container.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+    public virtual T Resolve<T>() where T : class
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        return scope.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+    }
 
     /// <inheritdoc />
     public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class
@@ -59,23 +67,47 @@ public class DryIocEngine : IEngine, IDisposable
             throw new InvalidOperationException("Container is not initialized");
         }
 
+        using var scope = _container.OpenScope();
         // Convert dictionary to array of parameters
         object[] args = ctorArgs.Values.ToArray();
-        return _container.Resolve<T>(args);
+        return scope.Resolve<T>(args);
     }
 
     /// <inheritdoc />
-    public virtual object Resolve(Type type) =>
-        _container.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+    public virtual object Resolve(Type type)
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        return scope.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+    }
 
     /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class =>
-        _container == null
-            ? throw new InvalidOperationException("Container is not initialized")
-            : _container.Resolve<T>(serviceKey: name);
+    public T ResolveNamed<T>(string name) where T : class
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        return scope.Resolve<T>(serviceKey: name);
+    }
 
     /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>() => _container.ResolveMany<T>();
+    public virtual IEnumerable<T> ResolveAll<T>()
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        return scope.ResolveMany<T>();
+    }
 
     /// <inheritdoc />
     public IEnumerable<T> ResolveAllNamed<T>(string name) =>
