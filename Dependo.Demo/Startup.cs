@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using DryIoc;
+using LightInject;
 
 namespace Dependo.Demo;
 
@@ -58,12 +59,12 @@ public class Startup
     //    //  But it's better to use IDependencyRegistrar
     //}
 
-    // For Autofac
-    public void ConfigureContainer(Container builder)
-    {
-        // Add extra registrations here, if needed...
-        //  But it's better to use IDependencyRegistrar
-    }
+    //// For DryIoC
+    //public void ConfigureContainer(Container builder)
+    //{
+    //    // Add extra registrations here, if needed...
+    //    //  But it's better to use IDependencyRegistrar
+    //}
 
     //// For Lamar
     //public void ConfigureContainer(ServiceRegistry builder)
@@ -71,4 +72,11 @@ public class Startup
     //    // Add extra registrations here, if needed...
     //    //  But it's better to use IDependencyRegistrar
     //}
+
+    // For LightInject
+    public void ConfigureContainer(ServiceContainer builder)
+    {
+        // Add extra registrations here, if needed...
+        //  But it's better to use IDependencyRegistrar
+    }
 }

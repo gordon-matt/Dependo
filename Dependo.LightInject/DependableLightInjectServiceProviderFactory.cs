@@ -35,14 +35,9 @@ public class DependableLightInjectServiceProviderFactory : IServiceProviderFacto
         var serviceContainer = new ServiceContainer();
         using var rootScope = serviceContainer.BeginScope();
 
+        // TODO
         // RegisterServices(serviceContainer, rootScope, services);
-        Extenso.Reflection.ObjectExtensions.InvokeExtensionMethod(
-            serviceContainer,
-            typeof(DependencyInjectionContainerExtensions).Assembly,
-            "RegisterServices",
-            [rootScope, services]);
 
-        //serviceContainer.AddRange(services);
         configurationAction(serviceContainer);
         return serviceContainer;
     }
