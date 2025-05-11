@@ -19,8 +19,10 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Dependo.Autofac\Dependo.Autofac.csproj" />
+	  <ProjectReference Include="..\Dependo.DotNetDefault\Dependo.DotNetDefault.csproj" />
 	  <ProjectReference Include="..\Dependo.DryIoc\Dependo.DryIoc.csproj" />
 	  <ProjectReference Include="..\Dependo.Lamar\Dependo.Lamar.csproj" />
+	  <ProjectReference Include="..\Dependo.LightInject\Dependo.LightInject.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependo.Tests", "Dependo.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependo.DryIoc", "Dependo.DryIoc\Dependo.DryIoc.csproj", "{EFA5372C-D2C2-4136-9413-4F15F2EB9580}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependo.LightInject", "Dependo.LightInject\Dependo.LightInject.csproj", "{1757B9DE-643A-4C78-8DB7-19FBC82408A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependo.DotNetDefault", "Dependo.DotNetDefault\Dependo.DotNetDefault.csproj", "{3354E72B-66F7-48BF-A66B-303A0ECD81D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{EFA5372C-D2C2-4136-9413-4F15F2EB9580}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFA5372C-D2C2-4136-9413-4F15F2EB9580}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFA5372C-D2C2-4136-9413-4F15F2EB9580}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1757B9DE-643A-4C78-8DB7-19FBC82408A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1757B9DE-643A-4C78-8DB7-19FBC82408A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1757B9DE-643A-4C78-8DB7-19FBC82408A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1757B9DE-643A-4C78-8DB7-19FBC82408A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3354E72B-66F7-48BF-A66B-303A0ECD81D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3354E72B-66F7-48BF-A66B-303A0ECD81D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3354E72B-66F7-48BF-A66B-303A0ECD81D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3354E72B-66F7-48BF-A66B-303A0ECD81D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -16,6 +16,8 @@ public static class DependoContainerFactory
         "autofac" => CreateAutofacDependoContainer(),
         "dryioc" => CreateDryIocDependoContainer(),
         "lamar" => CreateLamarDependoContainer(),
+        "lightinject" => CreateLightInjectDependoContainer(),
+        "dotnetdefault" => CreateDotNetDefaultDependoContainer(),
         _ => throw new ArgumentException($"Unsupported container type: {containerType}", nameof(containerType))
     };
 
@@ -43,6 +45,24 @@ public static class DependoContainerFactory
         var dependoContainerType = Type.GetType("Dependo.Lamar.LamarDependoContainer, Dependo.Lamar");
         return dependoContainerType == null
             ? throw new InvalidOperationException("Dependo.Lamar assembly is not available")
+            : (IDependoContainer)Activator.CreateInstance(dependoContainerType)!;
+    }
+
+    private static IDependoContainer CreateLightInjectDependoContainer()
+    {
+        // Create LightInject dependo container dynamically to avoid reference coupling
+        var dependoContainerType = Type.GetType("Dependo.LightInject.LightInjectDependoContainer, Dependo.LightInject");
+        return dependoContainerType == null
+            ? throw new InvalidOperationException("Dependo.LightInject assembly is not available")
+            : (IDependoContainer)Activator.CreateInstance(dependoContainerType)!;
+    }
+
+    private static IDependoContainer CreateDotNetDefaultDependoContainer()
+    {
+        // Create .NET Default dependo container dynamically to avoid reference coupling
+        var dependoContainerType = Type.GetType("Dependo.DotNetDefault.DotNetDefaultDependoContainer, Dependo.DotNetDefault");
+        return dependoContainerType == null
+            ? throw new InvalidOperationException("Dependo.DotNetDefault assembly is not available")
             : (IDependoContainer)Activator.CreateInstance(dependoContainerType)!;
     }
 }
