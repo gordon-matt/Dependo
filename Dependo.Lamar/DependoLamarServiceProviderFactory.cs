@@ -7,16 +7,16 @@ namespace Dependo.Lamar;
 /// <summary>
 /// Dependo implementation of Lamar service provider factory for ASP.NET Core
 /// </summary>
-public class DependableLamarServiceProviderFactory : IServiceProviderFactory<ServiceRegistry>
+public class DependoLamarServiceProviderFactory : IServiceProviderFactory<ServiceRegistry>
 {
     private readonly Action<ServiceRegistry> configurationAction;
     private IServiceCollection? services;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DependableLamarServiceProviderFactory"/> class.
+    /// Initializes a new instance of the <see cref="DependoLamarServiceProviderFactory"/> class.
     /// </summary>
     /// <param name="configurationAction">Action on a <see cref="ServiceRegistry"/> that adds component registrations to the container.</param>
-    public DependableLamarServiceProviderFactory(Action<ServiceRegistry>? configurationAction = null)
+    public DependoLamarServiceProviderFactory(Action<ServiceRegistry>? configurationAction = null)
     {
         this.configurationAction = configurationAction ?? (registry => { });
     }

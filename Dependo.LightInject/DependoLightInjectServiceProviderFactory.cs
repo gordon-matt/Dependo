@@ -1,6 +1,4 @@
-using System.ComponentModel;
 using LightInject;
-using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,16 +7,16 @@ namespace Dependo.LightInject;
 /// <summary>
 /// Dependo implementation of LightInject service provider factory for ASP.NET Core
 /// </summary>
-public class DependableLightInjectServiceProviderFactory : IServiceProviderFactory<ServiceContainer>
+public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<ServiceContainer>
 {
     private readonly Action<ServiceContainer> configurationAction;
     private IServiceCollection? services;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DependableLightInjectServiceProviderFactory"/> class.
+    /// Initializes a new instance of the <see cref="DependoLightInjectServiceProviderFactory"/> class.
     /// </summary>
     /// <param name="configurationAction">Action on a <see cref="IServiceContainer"/> that adds component registrations to the container.</param>
-    public DependableLightInjectServiceProviderFactory(Action<IServiceContainer>? configurationAction = null)
+    public DependoLightInjectServiceProviderFactory(Action<IServiceContainer>? configurationAction = null)
     {
         this.configurationAction = configurationAction ?? (_ => { });
     }

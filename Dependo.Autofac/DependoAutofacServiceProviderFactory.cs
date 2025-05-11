@@ -8,16 +8,16 @@ namespace Dependo.Autofac;
 /// <summary>
 /// Dependo implementation of Autofac service provider factory for ASP.NET Core
 /// </summary>
-public class DependableAutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
+public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
 {
     private readonly Action<ContainerBuilder> configurationAction;
     private IServiceCollection? services;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DependableAutofacServiceProviderFactory"/> class.
+    /// Initializes a new instance of the <see cref="DependoAutofacServiceProviderFactory"/> class.
     /// </summary>
     /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/> that adds component registrations to the container.</param>
-    public DependableAutofacServiceProviderFactory(Action<ContainerBuilder>? configurationAction = null)
+    public DependoAutofacServiceProviderFactory(Action<ContainerBuilder>? configurationAction = null)
     {
         this.configurationAction = configurationAction ?? (builder => { });
     }
