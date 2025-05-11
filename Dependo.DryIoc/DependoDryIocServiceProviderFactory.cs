@@ -8,16 +8,16 @@ namespace Dependo.DryIoc;
 /// <summary>
 /// Dependo implementation of DryIoc service provider factory for ASP.NET Core
 /// </summary>
-public class DependableDryIocServiceProviderFactory : IServiceProviderFactory<IContainer>
+public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<IContainer>
 {
     private readonly Action<IContainer> _configurationAction;
     private IServiceCollection? _services;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DependableDryIocServiceProviderFactory"/> class.
+    /// Initializes a new instance of the <see cref="DependoDryIocServiceProviderFactory"/> class.
     /// </summary>
     /// <param name="configurationAction">Action on a <see cref="IContainer"/> that adds component registrations to the container.</param>
-    public DependableDryIocServiceProviderFactory(Action<IContainer>? configurationAction = null)
+    public DependoDryIocServiceProviderFactory(Action<IContainer>? configurationAction = null)
     {
         _configurationAction = configurationAction ?? (_ => { });
     }
