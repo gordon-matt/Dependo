@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace Dependo.LightInject;
 
 /// <summary>
@@ -20,7 +22,7 @@ public class LightInjectDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     public int Order => _lightInjectRegistrar.Order;
 
     /// <inheritdoc/>
-    public void Register(IContainerBuilder builder, ITypeFinder typeFinder)
+    public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Extract the LightInject container if possible
         if (builder is LightInjectContainerBuilder lightInjectBuilder)

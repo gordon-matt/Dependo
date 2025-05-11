@@ -34,13 +34,13 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     /// <param name="container">Service container</param>
     /// <param name="configuration">Configuration root of the application</param>
     /// <returns>Service provider</returns>
-    public virtual IServiceProvider ConfigureServices(ServiceContainer container, IConfigurationRoot configuration)
+    public virtual IServiceProvider ConfigureServices(ServiceContainer container, IConfiguration configuration)
     {
         // Find startup configurations provided by other assemblies
         var typeFinder = new WebAppTypeFinder();
 
         // Register dependencies
-        ServiceProvider = RegisterDependencies(container, typeFinder);
+        ServiceProvider = RegisterDependencies(container, typeFinder, configuration);
         _container = container;
 
         return ServiceProvider;
@@ -178,7 +178,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     /// </summary>
     /// <param name="container">Service container</param>
     /// <param name="typeFinder">Type finder</param>
-    protected virtual IServiceProvider RegisterDependencies(ServiceContainer container, ITypeFinder typeFinder)
+    protected virtual IServiceProvider RegisterDependencies(ServiceContainer container, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Register dependo container
         container.RegisterInstance(this);
@@ -205,7 +205,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
         // Register all provided dependencies
         foreach (var dependencyRegistrar in instances)
         {
-            dependencyRegistrar.Register(builder, typeFinder);
+            dependencyRegistrar.Register(builder, typeFinder, configuration);
         }
 
         return container.CreateServiceProvider(new ServiceCollection());

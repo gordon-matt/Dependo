@@ -32,13 +32,13 @@ public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
     /// <param name="services">Service collection</param>
     /// <param name="configuration">Configuration root of the application</param>
     /// <returns>Service provider</returns>
-    public virtual IServiceProvider ConfigureServices(IServiceCollection services, IConfigurationRoot configuration)
+    public virtual IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         // Find startup configurations provided by other assemblies
         var typeFinder = new WebAppTypeFinder();
 
         // Register dependencies
-        ServiceProvider = RegisterDependencies(services, typeFinder);
+        ServiceProvider = RegisterDependencies(services, typeFinder, configuration);
         _serviceProvider = ServiceProvider;
 
         return ServiceProvider;
@@ -94,7 +94,7 @@ public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
     /// </summary>
     /// <param name="services">Service collection</param>
     /// <param name="typeFinder">Type finder</param>
-    protected virtual IServiceProvider RegisterDependencies(IServiceCollection services, ITypeFinder typeFinder)
+    protected virtual IServiceProvider RegisterDependencies(IServiceCollection services, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Register dependo container
         services.AddSingleton<IDependoContainer>(this);
@@ -114,7 +114,7 @@ public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
         // Register all provided dependencies
         foreach (var dependencyRegistrar in instances)
         {
-            dependencyRegistrar.Register(new DotNetDefaultContainerBuilder(services), typeFinder);
+            dependencyRegistrar.Register(new DotNetDefaultContainerBuilder(services), typeFinder, configuration);
         }
 
         return services.BuildServiceProvider();

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace Dependo.Lamar;
 
 /// <summary>
@@ -20,7 +22,7 @@ public class LamarDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     public int Order => _lamarRegistrar.Order;
 
     /// <inheritdoc/>
-    public void Register(IContainerBuilder builder, ITypeFinder typeFinder)
+    public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Extract the Lamar service registry if possible
         if (builder is LamarContainerBuilder lamarBuilder)

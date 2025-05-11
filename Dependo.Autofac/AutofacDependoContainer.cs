@@ -34,13 +34,13 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
     /// <param name="containerBuilder">Container builder from Autofac</param>
     /// <param name="configuration">Configuration root of the application</param>
     /// <returns>Service provider</returns>
-    public virtual IServiceProvider ConfigureServices(ContainerBuilder containerBuilder, IConfigurationRoot configuration)
+    public virtual IServiceProvider ConfigureServices(ContainerBuilder containerBuilder, IConfiguration configuration)
     {
         // Find startup configurations provided by other assemblies
         var typeFinder = new WebAppTypeFinder();
 
         // Register dependencies
-        RegisterDependencies(containerBuilder, typeFinder);
+        RegisterDependencies(containerBuilder, typeFinder, configuration);
 
         // Resolve assemblies here to avoid exceptions when rendering views
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
@@ -108,7 +108,7 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
     /// </summary>
     /// <param name="containerBuilder">Container Builder</param>
     /// <param name="typeFinder">Type finder</param>
-    protected virtual IServiceProvider RegisterDependencies(ContainerBuilder containerBuilder, ITypeFinder typeFinder)
+    protected virtual IServiceProvider RegisterDependencies(ContainerBuilder containerBuilder, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Register dependo container
         containerBuilder.RegisterInstance(this).As<IDependoContainer>().SingleInstance();
@@ -147,7 +147,7 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
         // Register all provided dependencies
         foreach (var dependencyRegistrar in orderedInstances)
         {
-            dependencyRegistrar.Register(builder, typeFinder);
+            dependencyRegistrar.Register(builder, typeFinder, configuration);
         }
 
         // Create service provider
