@@ -13,9 +13,29 @@ Check the demo project for how to use it.
 
 > Dependo.Autofac: https://www.nuget.org/packages/Dependo.Autofac/
 
+> Dependo.DotNetDefault: coming soon.
+
 > Dependo.DryIoc: coming soon.
 
 > Dependo.Lamar: coming soon.
+
+> Dependo.LightInject: coming soon.
+
+## Feature Support
+
+The default .NET implementation suits most needs. You could start with that and then if more advanced features are required, simply swap out that implementation for another. Use the following table to help decide which is most suitable for your project.
+
+| Method                                                             | Default .NET DI | Autofac | DryIoc | Lamar | LightInject |
+|--------------------------------------------------------------------|------------------|---------|--------|--------|--------------|
+| `Resolve<T>()`                                                     | ✅               | ✅      | ✅     | ✅     | ✅           |
+| `Resolve<T>(IDictionary<string, object> ctorArgs)`                 | ❌               | ✅      | ✅     | ❌     | ❌           |
+| `object Resolve(Type type)`                                       | ✅               | ✅      | ✅     | ✅     | ✅           |
+| `T ResolveNamed<T>(string name)`                                   | ❌               | ✅      | ✅     | ✅     | ✅           |
+| `IEnumerable<T> ResolveAll<T>()`                                   | ✅               | ✅      | ✅     | ✅     | ✅           |
+| `IEnumerable<T> ResolveAllNamed<T>`                                | ❌               | ✅      | ❌     | ❌     | ❌           |
+| `object ResolveUnregistered(Type type)`                            | ❌               | ✅      | ❌     | ✅     | ❌           |
+| `bool TryResolve<T>(out T? instance)`                              | ✅               | ✅      | ✅     | ✅     | ✅           |
+| `bool TryResolve(Type serviceType, out object? instance)`          | ✅               | ✅      | ✅     | ✅     | ✅           |
 
 ## Credits
 
