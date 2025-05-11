@@ -2,11 +2,11 @@
 
 ## Info
 
-Dependo is a library that let's you resolve dependencies from anywhere via a singleton call to `EngineContext.Current`. This is mostly useful for resolving dependencies in static classes, including extensions methods.
+Dependo is a library that let's you resolve dependencies from anywhere via a singleton call to `DependoResolver.Instance`. This is mostly useful for resolving dependencies in static classes, including extensions methods.
 
-Additionally, there is an `IDependencyRegistrar` interface to let you register dependencies from anywhere, such as class libraries.
+Additionally, there is an `IDependencyRegistrar` interface to let you register dependencies from anywhere, such as class libraries. If you need to take advantage of implementation-specific registration features, you can make use of the more specialized dependency registrar, such as `IAutofacDependencyRegistrar`, `IDryIocDependencyRegistrar`, etc.
 
-Check the demo project for how to use it.
+Check the demo project for a clearer idea on how to use Dependo.
 
 ## NuGet Packages
 > Dependo: https://www.nuget.org/packages/Dependo/

@@ -1,5 +1,4 @@
-using Dependo.Autofac;
-using Dependo.DryIoc;
+using Dependo.LightInject;
 
 namespace Dependo.Demo;
 
@@ -15,6 +14,7 @@ public class Program
                 webBuilder.UseStartup<Startup>();
             })
             //.UseServiceProviderFactory(new DependableAutofacServiceProviderFactory());
-            .UseServiceProviderFactory(new DependableDryIocServiceProviderFactory());
+            //.UseServiceProviderFactory(new DependableDryIocServiceProviderFactory());
             //.UseServiceProviderFactory(new DependableLamarServiceProviderFactory());
+            .UseServiceProviderFactory(new DependableLightInjectServiceProviderFactory());
 }
