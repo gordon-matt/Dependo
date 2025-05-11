@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace Dependo.Autofac;
 
 /// <summary>
@@ -20,7 +22,7 @@ public class AutofacDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     public int Order => _autofacRegistrar.Order;
 
     /// <inheritdoc/>
-    public void Register(IContainerBuilder builder, ITypeFinder typeFinder)
+    public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Extract the Autofac container builder if possible
         if (builder is AutofacContainerBuilder autofacBuilder)

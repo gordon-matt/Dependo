@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace Dependo;
 
 /// <summary>
@@ -10,7 +12,7 @@ public interface IDependencyRegistrar
     /// </summary>
     /// <param name="builder">Container builder abstraction</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(IContainerBuilder builder, ITypeFinder typeFinder);
+    void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration);
 
     /// <summary>
     /// Gets order of this dependency registrar implementation

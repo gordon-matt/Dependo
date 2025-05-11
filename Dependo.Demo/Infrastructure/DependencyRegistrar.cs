@@ -6,7 +6,7 @@ public class DependencyRegistrar : IDependencyRegistrar
 {
     public int Order => 1;
 
-    public void Register(IContainerBuilder builder, ITypeFinder typeFinder)
+    public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Basic service registration
         builder.Register<IHelloWorldService, HelloWorldService>();

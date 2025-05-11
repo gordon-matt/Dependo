@@ -40,7 +40,6 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
         return serviceContainer;
     }
 
-
     /// <summary>
     /// Creates an <see cref="IServiceProvider"/> from the container.
     /// </summary>
@@ -78,4 +77,4 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
 
         return serviceProvider;
     }
-} 
+}
