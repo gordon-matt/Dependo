@@ -20,7 +20,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 
-// Configure LightInject
 builder.Host
     // Configure Dependo for whichever container you want to use
     .UseServiceProviderFactory(new DependoAutofacServiceProviderFactory())
@@ -38,7 +37,7 @@ builder.Host
     // {
     //     // Add your Lamar-specific registrations here or use an ILamarDependencyRegistrar
     // });
-    //.UseServiceProviderFactory(new DependoLightInjectServiceProviderFactory())
+    //.UseServiceProviderFactory(new DependoLightInjectServiceProviderFactory()) // LightInject implementation not working yet
     //.ConfigureContainer<ServiceContainer>(container =>
     //{
     //    // Add your LightInject-specific registrations here or use an ILightInjectDependencyRegistrar
