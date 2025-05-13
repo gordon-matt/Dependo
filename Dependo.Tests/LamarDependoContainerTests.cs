@@ -32,8 +32,8 @@ public class LamarDependoContainerTests : DependoContainerTestsBase<LamarDependo
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() =>
         {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
-            containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
+            containerBuilder.RegisterNamed<ITestService, AnotherTestService>("test-services", ServiceLifetime.Singleton);
         });
 
         // Act & Assert
@@ -47,8 +47,8 @@ public class LamarDependoContainerTests : DependoContainerTestsBase<LamarDependo
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() =>
         {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
-            containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
+            containerBuilder.RegisterNamed<ITestService, AnotherTestService>("test-services", ServiceLifetime.Singleton);
         });
 
         // Act & Assert

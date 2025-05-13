@@ -69,14 +69,4 @@ public abstract class BaseDependoContainer : IDependoContainer
     public abstract bool TryResolve(Type serviceType, out object? instance);
 
     public abstract void Dispose();
-
-    protected static string StringifyKey(object key) => key switch
-    {
-        string s => s,
-        int i => i.ToString(),
-        Enum e => e.ToString(),
-        Guid g => g.ToString(),
-        null => throw new ArgumentNullException(nameof(key)),
-        _ => $"{key.GetType().FullName}:{key.GetHashCode()}"
-    };
 }

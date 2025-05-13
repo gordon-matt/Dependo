@@ -23,121 +23,191 @@ public class LightInjectContainerBuilder : IContainerBuilder
     public IServiceContainer NativeContainer { get; }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         var lifetimeType = GetLifetime(lifetime);
-        if (!string.IsNullOrEmpty(name))
+        if (lifetimeType != null)
         {
-            if (lifetimeType != null)
-            {
-                NativeContainer.Register(serviceType, implementationType, name, lifetimeType);
-            }
-            else
-            {
-                NativeContainer.Register(serviceType, implementationType, name);
-            }
+            NativeContainer.Register(serviceType, implementationType, lifetimeType);
         }
         else
         {
-            if (lifetimeType != null)
-            {
-                NativeContainer.Register(serviceType, implementationType, lifetimeType);
-            }
-            else
-            {
-                NativeContainer.Register(serviceType, implementationType);
-            }
+            NativeContainer.Register(serviceType, implementationType);
         }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class
         where TImplementation : class, TService
     {
         var lifetimeType = GetLifetime(lifetime);
-        if (!string.IsNullOrEmpty(name))
+        if (lifetimeType != null)
         {
-            if (lifetimeType != null)
-            {
-                NativeContainer.Register<TService, TImplementation>(name, lifetimeType);
-            }
-            else
-            {
-                NativeContainer.Register<TService, TImplementation>(name);
-            }
+            NativeContainer.Register<TService, TImplementation>(lifetimeType);
         }
         else
         {
-            if (lifetimeType != null)
-            {
-                NativeContainer.Register<TService, TImplementation>(lifetimeType);
-            }
-            else
-            {
-                NativeContainer.Register<TService, TImplementation>();
-            }
+            NativeContainer.Register<TService, TImplementation>();
         }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TImplementation : class
     {
         var lifetimeType = GetLifetime(lifetime);
-        if (!string.IsNullOrEmpty(name))
+        if (lifetimeType != null)
         {
-            if (lifetimeType != null)
-            {
-                NativeContainer.Register<TImplementation, TImplementation>(name, lifetimeType);
-            }
-            else
-            {
-                NativeContainer.Register<TImplementation, TImplementation>(name);
-            }
+            NativeContainer.Register<TImplementation>(lifetimeType);
         }
         else
         {
-            if (lifetimeType != null)
-            {
-                NativeContainer.Register<TImplementation>(lifetimeType);
-            }
-            else
-            {
-                NativeContainer.Register<TImplementation>();
-            }
+            NativeContainer.Register<TImplementation>();
         }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance<TService>(TService instance, string? name = null)
+    public IContainerBuilder RegisterInstance<TService>(TService instance)
         where TService : class
     {
-        if (!string.IsNullOrEmpty(name))
+        NativeContainer.RegisterInstance(instance);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstance(Type serviceType, object instance)
+    {
+        NativeContainer.RegisterInstance(serviceType, instance);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterNamed(Type serviceType, Type implementationType, string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
         {
-            NativeContainer.RegisterInstance(instance, name);
+            NativeContainer.Register(serviceType, implementationType, name, lifetimeType);
         }
         else
         {
-            NativeContainer.RegisterInstance(instance);
+            NativeContainer.Register(serviceType, implementationType, name);
         }
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance(Type serviceType, object instance, string? name = null)
+    public IContainerBuilder RegisterNamed<TService, TImplementation>(string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TService : class
+        where TImplementation : class, TService
     {
-        if (!string.IsNullOrEmpty(name))
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
         {
-            NativeContainer.RegisterInstance(serviceType, instance, name);
+            NativeContainer.Register<TService, TImplementation>(name, lifetimeType);
         }
         else
         {
-            NativeContainer.RegisterInstance(serviceType, instance);
+            NativeContainer.Register<TService, TImplementation>(name);
         }
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterSelfNamed<TImplementation>(string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TImplementation : class
+    {
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
+        {
+            NativeContainer.Register<TImplementation, TImplementation>(name, lifetimeType);
+        }
+        else
+        {
+            NativeContainer.Register<TImplementation, TImplementation>(name);
+        }
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceNamed<TService>(TService instance, string name)
+        where TService : class
+    {
+        NativeContainer.RegisterInstance(instance, name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceNamed(Type serviceType, object instance, string name)
+    {
+        NativeContainer.RegisterInstance(serviceType, instance, name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterKeyed(Type serviceType, Type implementationType, object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
+        {
+            NativeContainer.Register(serviceType, implementationType, DependoHelper.StringifyKey(key)!, lifetimeType);
+        }
+        else
+        {
+            NativeContainer.Register(serviceType, implementationType, DependoHelper.StringifyKey(key)!);
+        }
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterKeyed<TService, TImplementation>(object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
+        {
+            NativeContainer.Register<TService, TImplementation>(DependoHelper.StringifyKey(key)!, lifetimeType);
+        }
+        else
+        {
+            NativeContainer.Register<TService, TImplementation>(DependoHelper.StringifyKey(key)!);
+        }
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterSelfKeyed<TImplementation>(object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TImplementation : class
+    {
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
+        {
+            NativeContainer.Register<TImplementation, TImplementation>(DependoHelper.StringifyKey(key), lifetimeType);
+        }
+        else
+        {
+            NativeContainer.Register<TImplementation, TImplementation>(DependoHelper.StringifyKey(key));
+        }
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceKeyed<TService>(TService instance, object key)
+        where TService : class
+    {
+        NativeContainer.RegisterInstance(instance, DependoHelper.StringifyKey(key)!);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceKeyed(Type serviceType, object instance, object key)
+    {
+        NativeContainer.RegisterInstance(serviceType, instance, DependoHelper.StringifyKey(key)!);
         return this;
     }
 

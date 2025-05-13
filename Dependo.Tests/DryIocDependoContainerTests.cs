@@ -32,7 +32,7 @@ public class DryIocDependoContainerTests : DependoContainerTestsBase<DryIocDepen
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() =>
         {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
 
             // Attempting to register more than one service of the same type with the same key results in an exception anyway.
             //containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
@@ -49,10 +49,10 @@ public class DryIocDependoContainerTests : DependoContainerTestsBase<DryIocDepen
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() =>
         {
-            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
 
             // Attempting to register more than one service of the same type with the same key results in an exception anyway.
-            //containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
+            //containerBuilder.RegisterNamed<ITestService, AnotherTestService>("test-services", ServiceLifetime.Singleton);
         });
 
         // Act & Assert
