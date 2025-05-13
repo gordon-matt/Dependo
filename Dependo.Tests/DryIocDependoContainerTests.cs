@@ -42,4 +42,21 @@ public class DryIocDependoContainerTests : DependoContainerTestsBase<DryIocDepen
         Assert.Throws<NotSupportedException>(() =>
             dependoContainer.ResolveAllNamed<ITestService>("test-services"));
     }
+
+    [Fact]
+    public override void ResolveAllKeyed_MultipleKeyedInstances_ReturnsAllInstances()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
+
+            // Attempting to register more than one service of the same type with the same key results in an exception anyway.
+            //containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
+        });
+
+        // Act & Assert
+        Assert.Throws<NotSupportedException>(() =>
+            dependoContainer.ResolveAllKeyed<ITestService>("test-services"));
+    }
 }

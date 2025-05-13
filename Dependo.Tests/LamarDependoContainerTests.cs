@@ -40,4 +40,19 @@ public class LamarDependoContainerTests : DependoContainerTestsBase<LamarDependo
         Assert.Throws<NotSupportedException>(() =>
             dependoContainer.ResolveAllNamed<ITestService>("test-services"));
     }
+
+    [Fact]
+    public override void ResolveAllKeyed_MultipleKeyedInstances_ReturnsAllInstances()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
+        });
+
+        // Act & Assert
+        Assert.Throws<NotSupportedException>(() =>
+            dependoContainer.ResolveAllKeyed<ITestService>("test-services"));
+    }
 }

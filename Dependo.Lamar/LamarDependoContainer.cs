@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using Lamar;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,7 @@ public class LamarDependoContainer : BaseDependoContainer
 
     #region IDependoContainer Members
 
+    /// <inheritdoc />
     public override bool IsRegistered(Type serviceType) =>
         _container == null
             ? throw new InvalidOperationException("Container is not initialized")
@@ -61,6 +63,21 @@ public class LamarDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override object Resolve(Type type) =>
         ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key) where T : class =>
+        _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : ResolveNamed<T>(StringifyKey(key));
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class =>
+        throw new NotSupportedException("Lamar does not support passing constructor arguments");
+
+    /// <inheritdoc />
+    public override IEnumerable<T> ResolveAllKeyed<T>(object key) =>
+        throw new NotSupportedException(
+            "Lamar does not support multiple keyed registrations of the same type. When registering, they get overriden. Call ResolveKeyed<T> instead");
 
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class =>

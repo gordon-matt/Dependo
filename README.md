@@ -31,9 +31,9 @@ The default .NET implementation suits most needs. You could start with that and 
 | `Resolve<T>()`                                                | ✅               | ✅      | ✅     | ✅     | ✅        |
 | `Resolve<T>(IDictionary<string, object> ctorArgs)`            | ❌               | ✅      | ✅     | ❌     | ❌        |
 | `object Resolve(Type type)`                                   | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `T ResolveNamed<T>(string name)`                              | ❌               | ✅      | ✅     | ✅     | ✅        |
+| `T ResolveNamed<T>(string name)`                              | ✅               | ✅      | ✅     | ✅     | ✅        |
 | `IEnumerable<T> ResolveAll<T>()`                              | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `IEnumerable<T> ResolveAllNamed<T>`                           | ❌               | ✅      | ❌     | ❌     | ❌        |
+| `IEnumerable<T> ResolveAllNamed<T>`                           | ✅               | ✅      | ❌     | ❌     | ❌        |
 | `object ResolveUnregistered(Type type)`                       | ✅               | ✅      | ✅     | ✅     | ✅        |
 | `bool TryResolve<T>(out T? instance)`                         | ✅               | ✅      | ✅     | ✅     | ✅        |
 | `bool TryResolve(Type serviceType, out object? instance)`     | ✅               | ✅      | ✅     | ✅     | ✅        |

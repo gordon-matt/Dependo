@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +46,7 @@ public class DryIocDependoContainer : BaseDependoContainer
 
     #region IDependoContainer Members
 
+    /// <inheritdoc />
     public override bool IsRegistered(Type serviceType) => _container.IsRegistered(serviceType);
 
     /// <inheritdoc />
@@ -83,6 +85,44 @@ public class DryIocDependoContainer : BaseDependoContainer
 
         using var scope = _container.OpenScope();
         return scope.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+    }
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key) where T : class
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        return scope.Resolve<T>(serviceKey: key);
+    }
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        // Convert dictionary to array of parameters
+        object[] args = ctorArgs.Values.ToArray();
+        return scope.Resolve<T>(args, serviceKey: key);
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<T> ResolveAllKeyed<T>(object key)
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.OpenScope();
+        return scope.ResolveMany<T>(serviceKey: key);
     }
 
     /// <inheritdoc />

@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -44,6 +45,7 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
 
     #region IDependoContainer Members
 
+    /// <inheritdoc />
     public override bool IsRegistered(Type serviceType)
     {
         var serviceProviderIsService = ServiceProvider.GetService<IServiceProviderIsService>();
@@ -63,6 +65,17 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override object Resolve(Type type) =>
         ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key) where T : class =>
+        ServiceProvider.GetKeyedService<T>(key) ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class =>
+        throw new NotSupportedException(".NET Default DI does not support passing constructor arguments");
+
+    /// <inheritdoc />
+    public override IEnumerable<T> ResolveAllKeyed<T>(object key) => ServiceProvider.GetKeyedServices<T>(key);
 
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class =>

@@ -41,6 +41,21 @@ public class LightInjectDependoContainerTests : DependoContainerTestsBase<LightI
             dependoContainer.ResolveAllNamed<ITestService>("test-services"));
     }
 
+    [Fact]
+    public override void ResolveAllKeyed_MultipleKeyedInstances_ReturnsAllInstances()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            containerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
+            containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
+        });
+
+        // Act & Assert
+        Assert.Throws<NotSupportedException>(() =>
+            dependoContainer.ResolveAllKeyed<ITestService>("test-services"));
+    }
+
     // Note: LightInject does not support multiple registrations of type same type - it overrides them with whatever the last one registered was
     // TODO: Consider changing this unit test to use different service types.
     [Fact]
