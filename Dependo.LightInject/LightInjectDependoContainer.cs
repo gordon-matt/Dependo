@@ -8,7 +8,7 @@ namespace Dependo.LightInject;
 /// <summary>
 /// LightInject implementation of the Dependo container
 /// </summary>
-public class LightInjectDependoContainer : BaseDependoContainer, IDisposable
+public class LightInjectDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
@@ -214,7 +214,7 @@ public class LightInjectDependoContainer : BaseDependoContainer, IDisposable
     #region IDisposable Members
 
     /// <inheritdoc />
-    public void Dispose()
+    public override void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);

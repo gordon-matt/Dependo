@@ -47,4 +47,6 @@ public abstract class BaseDependoContainer : IDependoContainer
     public abstract bool TryResolve<T>(out T? instance) where T : class;
 
     public abstract bool TryResolve(Type serviceType, out object? instance);
+
+    public abstract void Dispose();
 }

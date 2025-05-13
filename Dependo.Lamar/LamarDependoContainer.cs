@@ -7,7 +7,7 @@ namespace Dependo.Lamar;
 /// <summary>
 /// Lamar implementation of the Dependo container
 /// </summary>
-public class LamarDependoContainer : BaseDependoContainer, IDisposable
+public class LamarDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
@@ -148,7 +148,7 @@ public class LamarDependoContainer : BaseDependoContainer, IDisposable
     #region IDisposable Members
 
     /// <inheritdoc />
-    public void Dispose()
+    public override void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);

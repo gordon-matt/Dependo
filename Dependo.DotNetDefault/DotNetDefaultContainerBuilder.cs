@@ -26,7 +26,11 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     {
         if (!string.IsNullOrEmpty(name))
         {
-            throw new NotSupportedException(".NET Default DI does not support named services");
+            Services.Add(new ServiceDescriptor(
+                serviceType: serviceType,
+                implementationType: implementationType,
+                lifetime: lifetime,
+                serviceKey: name));
         }
 
         Services.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
@@ -40,7 +44,11 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     {
         if (!string.IsNullOrEmpty(name))
         {
-            throw new NotSupportedException(".NET Default DI does not support named services");
+            Services.Add(new ServiceDescriptor(
+                serviceType: typeof(TService),
+                implementationType: typeof(TImplementation),
+                lifetime: lifetime,
+                serviceKey: name));
         }
 
         Services.Add(new ServiceDescriptor(typeof(TService), typeof(TImplementation), lifetime));
@@ -53,7 +61,11 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     {
         if (!string.IsNullOrEmpty(name))
         {
-            throw new NotSupportedException(".NET Default DI does not support named services");
+            Services.Add(new ServiceDescriptor(
+                serviceType: typeof(TImplementation),
+                implementationType: typeof(TImplementation),
+                lifetime: lifetime,
+                serviceKey: name));
         }
 
         Services.Add(new ServiceDescriptor(typeof(TImplementation), typeof(TImplementation), lifetime));
@@ -66,7 +78,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     {
         if (!string.IsNullOrEmpty(name))
         {
-            throw new NotSupportedException(".NET Default DI does not support named services");
+            Services.Add(new ServiceDescriptor(
+                serviceType: typeof(TService),
+                instance: instance,
+                serviceKey: name));
         }
 
         Services.Add(new ServiceDescriptor(typeof(TService), instance));
@@ -78,10 +93,13 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     {
         if (!string.IsNullOrEmpty(name))
         {
-            throw new NotSupportedException(".NET Default DI does not support named services");
+            Services.Add(new ServiceDescriptor(
+                serviceType: serviceType,
+                instance: instance,
+                serviceKey: name));
         }
 
         Services.Add(new ServiceDescriptor(serviceType, instance));
         return this;
     }
-} 
+}
