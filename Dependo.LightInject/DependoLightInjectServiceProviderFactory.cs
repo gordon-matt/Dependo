@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Reflection;
 using LightInject;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,12 +34,25 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
 
         var serviceContainer = new ServiceContainer();
         using var rootScope = serviceContainer.BeginScope();
-
-        // TODO
-        // RegisterServices(serviceContainer, rootScope, services);
-
+        InvokeRegisterServices(serviceContainer, rootScope, services);
         configurationAction(serviceContainer);
         return serviceContainer;
+    }
+
+    public static void InvokeRegisterServices(object container, object rootScope, IServiceCollection serviceCollection)
+    {
+        // Get the type containing the private method
+        var type = typeof(global::LightInject.Microsoft.DependencyInjection.DependencyInjectionContainerExtensions);
+
+        // Get the private method using reflection
+        var method = type.GetMethod("RegisterServices", BindingFlags.NonPublic | BindingFlags.Static);
+        if (method == null)
+        {
+            throw new InvalidOperationException("The method 'RegisterServices' could not be found.");
+        }
+
+        // Invoke the private method
+        method.Invoke(null, [container, rootScope, serviceCollection]);
     }
 
     /// <summary>
@@ -73,7 +88,9 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
         var serviceProvider = dependoContainer.ConfigureServices(container, configuration!);
 
         // Set dependo container as the singleton instance
+#pragma warning disable DF0001 // Should not be disposed here.
         DependoResolver.Create(dependoContainer);
+#pragma warning restore DF0001
 
         return serviceProvider;
     }
