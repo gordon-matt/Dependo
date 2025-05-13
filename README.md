@@ -25,18 +25,22 @@ Check the demo project for a clearer idea on how to use Dependo.
 
 The default .NET implementation suits most needs. You could start with that and then if more advanced features are required, simply swap out that implementation for another. Use the following table to help decide which is most suitable for your project.
 
-| Method                                                        | Default .NET DI | Autofac | DryIoc | Lamar | LightInject |
-|---------------------------------------------------------------|------------------|---------|--------|--------|-----------|
-| `IsRegistered(Type serviceType)`                              | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `Resolve<T>()`                                                | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `Resolve<T>(IDictionary<string, object> ctorArgs)`            | ❌               | ✅      | ✅     | ❌     | ❌        |
-| `object Resolve(Type type)`                                   | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `T ResolveNamed<T>(string name)`                              | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `IEnumerable<T> ResolveAll<T>()`                              | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `IEnumerable<T> ResolveAllNamed<T>`                           | ✅               | ✅      | ❌     | ❌     | ❌        |
-| `object ResolveUnregistered(Type type)`                       | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `bool TryResolve<T>(out T? instance)`                         | ✅               | ✅      | ✅     | ✅     | ✅        |
-| `bool TryResolve(Type serviceType, out object? instance)`     | ✅               | ✅      | ✅     | ✅     | ✅        |
+| Method                                                                  | Default .NET DI | Autofac | DryIoc | Lamar | LightInject |
+|-------------------------------------------------------------------------|------------------|---------|--------|--------|-----------|
+| `IsRegistered(Type serviceType)`                                        | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `Resolve<T>()`                                                          | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `Resolve<T>(IDictionary<string, object> ctorArgs)`                      | ❌               | ✅      | ✅     | ❌     | ❌        |
+| `object Resolve(Type type)`                                             | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `T ResolveKeyed<T>(object key)`                                         | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs)`   | ❌               | ✅      | ✅     | ❌     | ❌        |
+| `IEnumerable<T> ResolveAllKeyed<T>(object key)`                         | ✅               | ✅      | ❌     | ❌     | ❌        |
+| `IEnumerable<T> ResolveAll<T>()`                                        | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `IEnumerable<T> ResolveAllNamed<T>`                                     | ✅               | ✅      | ❌     | ❌     | ❌        |
+| `T ResolveNamed<T>(string name)`                                        | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `T? ResolveUnregistered<T>()`                                           | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `object ResolveUnregistered(Type type)`                                 | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `bool TryResolve<T>(out T? instance)`                                   | ✅               | ✅      | ✅     | ✅     | ✅        |
+| `bool TryResolve(Type serviceType, out object? instance)`               | ✅               | ✅      | ✅     | ✅     | ✅        |
 
 ## Credits
 

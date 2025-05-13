@@ -114,16 +114,8 @@ public class DryIocDependoContainer : BaseDependoContainer
     }
 
     /// <inheritdoc />
-    public override IEnumerable<T> ResolveAllKeyed<T>(object key)
-    {
-        if (_container == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        using var scope = _container.OpenScope();
-        return scope.ResolveMany<T>(serviceKey: key);
-    }
+    public override IEnumerable<T> ResolveAllKeyed<T>(object key) =>
+        throw new NotSupportedException("DryIOC does not support multiple registrations of the same type and key. When registering, an exception is thrown.");
 
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class
@@ -151,7 +143,7 @@ public class DryIocDependoContainer : BaseDependoContainer
 
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
-        throw new NotSupportedException("DryIOC does not support multiple named registrations of the same type. When registering, an exception is thrown.");
+        throw new NotSupportedException("DryIOC does not support multiple registrations of the same type and name. When registering, an exception is thrown.");
 
     /// <inheritdoc />
     public override bool TryResolve<T>(out T instance) where T : class

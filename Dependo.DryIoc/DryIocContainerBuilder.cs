@@ -23,76 +23,119 @@ public class DryIocContainerBuilder : IContainerBuilder
     public IContainer NativeContainer { get; }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime), serviceKey: name);
-        }
-        else
-        {
-            NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime));
-        }
+        NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class
         where TImplementation : class, TService
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime), serviceKey: name);
-        }
-        else
-        {
-            NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime));
-        }
+        NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TImplementation : class
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            NativeContainer.Register<TImplementation>(GetReuse(lifetime), serviceKey: name);
-        }
-        else
-        {
-            NativeContainer.Register<TImplementation>(GetReuse(lifetime));
-        }
+        NativeContainer.Register<TImplementation>(GetReuse(lifetime));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance<TService>(TService instance, string? name = null)
+    public IContainerBuilder RegisterInstance<TService>(TService instance)
         where TService : class
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            NativeContainer.RegisterInstance(instance, serviceKey: name);
-        }
-        else
-        {
-            NativeContainer.RegisterInstance(instance);
-        }
+        NativeContainer.RegisterInstance(instance);
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance(Type serviceType, object instance, string? name = null)
+    public IContainerBuilder RegisterInstance(Type serviceType, object instance)
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            NativeContainer.RegisterInstance(serviceType, instance, serviceKey: name);
-        }
-        else
-        {
-            NativeContainer.RegisterInstance(serviceType, instance);
-        }
+        NativeContainer.RegisterInstance(serviceType, instance);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterNamed(Type serviceType, Type implementationType, string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime), serviceKey: name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterNamed<TService, TImplementation>(string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime), serviceKey: name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterSelfNamed<TImplementation>(string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TImplementation : class
+    {
+        NativeContainer.Register<TImplementation>(GetReuse(lifetime), serviceKey: name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceNamed<TService>(TService instance, string name)
+        where TService : class
+    {
+        NativeContainer.RegisterInstance(instance, serviceKey: name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceNamed(Type serviceType, object instance, string name)
+    {
+        NativeContainer.RegisterInstance(serviceType, instance, serviceKey: name);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterKeyed(Type serviceType, Type implementationType, object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime), serviceKey: key);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterKeyed<TService, TImplementation>(object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime), serviceKey: key);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterSelfKeyed<TImplementation>(object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TImplementation : class
+    {
+        NativeContainer.Register<TImplementation>(GetReuse(lifetime), serviceKey: key);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceKeyed<TService>(TService instance, object key)
+        where TService : class
+    {
+        NativeContainer.RegisterInstance(instance, serviceKey: key);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceKeyed(Type serviceType, object instance, object key)
+    {
+        NativeContainer.RegisterInstance(serviceType, instance, serviceKey: key);
         return this;
     }
 

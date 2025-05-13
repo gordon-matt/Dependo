@@ -6,9 +6,102 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
     where TContainer : IDependoContainer
     where TContainerBuilder : IContainerBuilder
 {
+    // Test interfaces and classes
+    public interface ITestService { }
+
     protected abstract TContainerBuilder ContainerBuilder { get; }
 
-    protected abstract TContainer ConfigureDependoContainer(Action registerServices);
+    [Fact]
+    public virtual void Register_WithKey_RegistersKeyedService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterKeyed<ITestService, TestService>("keyed-service", ServiceLifetime.Singleton));
+
+        // Act
+        var service = dependoContainer.ResolveKeyed<ITestService>("keyed-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
+
+    [Fact]
+    public virtual void Register_WithName_RegistersNamedService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterNamed<ITestService, TestService>("named-service", ServiceLifetime.Singleton));
+
+        // Act
+        var service = dependoContainer.ResolveNamed<ITestService>("named-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
+
+    [Fact]
+    public virtual void RegisterInstance_WithKey_RegistersKeyedInstance()
+    {
+        // Arrange
+        var instance = new TestService();
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterInstanceKeyed<ITestService>(instance, "keyed-instance"));
+
+        // Act
+        var service = dependoContainer.ResolveKeyed<ITestService>("keyed-instance");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Same(instance, service);
+    }
+
+    [Fact]
+    public virtual void RegisterInstance_WithName_RegistersNamedInstance()
+    {
+        // Arrange
+        var instance = new TestService();
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterInstanceNamed<ITestService>(instance, "named-instance"));
+
+        // Act
+        var service = dependoContainer.ResolveNamed<ITestService>("named-instance");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Same(instance, service);
+    }
+
+    [Fact]
+    public virtual void RegisterSelf_WithKey_RegistersKeyedService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterSelfKeyed<TestService>("keyed-service", ServiceLifetime.Singleton));
+
+        // Act
+        var service = dependoContainer.ResolveKeyed<TestService>("keyed-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
+
+    [Fact]
+    public virtual void RegisterSelf_WithName_RegistersNamedService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterSelfNamed<TestService>("named-service", ServiceLifetime.Singleton));
+
+        // Act
+        var service = dependoContainer.ResolveNamed<TestService>("named-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
 
     [Fact]
     public virtual void Resolve_RegisteredType_ReturnsInstance()
@@ -50,11 +143,92 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
     }
 
     [Fact]
+    public virtual void ResolveAll_MultipleRegisteredInstances_ReturnsAllInstances()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
+            ContainerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton);
+        });
+
+        // Act
+        var services = dependoContainer.ResolveAll<ITestService>().ToList();
+
+        // Assert
+        Assert.Equal(2, services.Count);
+        Assert.Contains(services, s => s.GetType() == typeof(TestService));
+        Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
+    }
+
+    [Fact]
+    public virtual void ResolveAllKeyed_MultipleKeyedInstances_ReturnsAllInstances()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            ContainerBuilder.RegisterKeyed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
+            ContainerBuilder.RegisterKeyed<ITestService, AnotherTestService>("test-services", ServiceLifetime.Singleton);
+        });
+
+        // Act
+        var services = dependoContainer.ResolveAllKeyed<ITestService>("test-services").ToList();
+
+        // Assert
+        Assert.Equal(2, services.Count);
+        Assert.Contains(services, s => s.GetType() == typeof(TestService));
+        Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
+    }
+
+    [Fact]
+    public virtual void ResolveAllNamed_MultipleNamedInstances_ReturnsAllInstances()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            ContainerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
+            ContainerBuilder.RegisterNamed<ITestService, AnotherTestService>("test-services", ServiceLifetime.Singleton);
+        });
+
+        // Act
+        var services = dependoContainer.ResolveAllNamed<ITestService>("test-services").ToList();
+
+        // Assert
+        Assert.Equal(2, services.Count);
+        Assert.Contains(services, s => s.GetType() == typeof(TestService));
+        Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
+    }
+
+    [Fact]
+    public virtual void ResolveKeyed_RegisteredKeyedType_ReturnsInstance()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterKeyed<ITestService, TestService>("test-service", ServiceLifetime.Singleton));
+
+        // Act
+        var service = dependoContainer.ResolveKeyed<ITestService>("test-service");
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<TestService>(service);
+    }
+
+    [Fact]
+    public virtual void ResolveKeyed_UnregisteredKeyedType_ThrowsException()
+    {
+        using var dependoContainer = ConfigureDependoContainer(() => { });
+        // Act & Assert
+        Assert.ThrowsAny<Exception>(() =>
+            dependoContainer.ResolveKeyed<ITestService>("test-service"));
+    }
+
+    [Fact]
     public virtual void ResolveNamed_RegisteredNamedType_ReturnsInstance()
     {
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-service"));
+            ContainerBuilder.RegisterNamed<ITestService, TestService>("test-service", ServiceLifetime.Singleton));
 
         // Act
         var service = dependoContainer.ResolveNamed<ITestService>("test-service");
@@ -74,71 +248,6 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
     }
 
     [Fact]
-    public virtual void ResolveAllNamed_MultipleNamedInstances_ReturnsAllInstances()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-        {
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
-            ContainerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
-        });
-
-        // Act
-        var services = dependoContainer.ResolveAllNamed<ITestService>("test-services").ToList();
-
-        // Assert
-        Assert.Equal(2, services.Count);
-        Assert.Contains(services, s => s.GetType() == typeof(TestService));
-        Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
-    }
-
-    [Fact]
-    public virtual void Register_WithName_RegistersNamedService()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "named-service"));
-
-        // Act
-        var service = dependoContainer.ResolveNamed<ITestService>("named-service");
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.IsType<TestService>(service);
-    }
-
-    [Fact]
-    public virtual void RegisterSelf_WithName_RegistersNamedService()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.RegisterSelf<TestService>(ServiceLifetime.Singleton, "named-service"));
-
-        // Act
-        var service = dependoContainer.ResolveNamed<TestService>("named-service");
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.IsType<TestService>(service);
-    }
-
-    [Fact]
-    public virtual void RegisterInstance_WithName_RegistersNamedInstance()
-    {
-        // Arrange
-        var instance = new TestService();
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.RegisterInstance<ITestService>(instance, "named-instance"));
-
-        // Act
-        var service = dependoContainer.ResolveNamed<ITestService>("named-instance");
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.Same(instance, service);
-    }
-
-    [Fact]
     public virtual void ResolveUnregistered_UnregisteredType_CreatesInstance()
     {
         // Arrange
@@ -150,54 +259,6 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
         // Assert
         Assert.NotNull(service);
         Assert.IsType<ConcreteService>(service);
-    }
-
-    [Fact]
-    public virtual void TryResolveWithType_RegisteredType_ReturnsTrue()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() => ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
-
-        // Act
-        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
-
-        // Assert
-        Assert.True(resolved);
-        Assert.NotNull(service);
-        Assert.IsType<TestService>(service);
-    }
-
-    [Fact]
-    public virtual void TryResolveWithType_UnregisteredType_ReturnsFalse()
-    {
-        // Configure the dependoContainer with our container
-        using var dependoContainer = ConfigureDependoContainer(() => { });
-
-        // Act
-        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
-
-        // Assert
-        Assert.False(resolved);
-        Assert.Null(service);
-    }
-
-    [Fact]
-    public virtual void ResolveAll_MultipleRegisteredInstances_ReturnsAllInstances()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-        {
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton);
-            ContainerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton);
-        });
-
-        // Act
-        var services = dependoContainer.ResolveAll<ITestService>().ToList();
-
-        // Assert
-        Assert.Equal(2, services.Count);
-        Assert.Contains(services, s => s.GetType() == typeof(TestService));
-        Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
     }
 
     [Fact]
@@ -229,122 +290,40 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
         Assert.Null(service);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     [Fact]
-    public virtual void ResolveKeyed_RegisteredKeyedType_ReturnsInstance()
+    public virtual void TryResolveWithType_RegisteredType_ReturnsTrue()
     {
         // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-service"));
+        using var dependoContainer = ConfigureDependoContainer(() => ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton));
 
         // Act
-        var service = dependoContainer.ResolveKeyed<ITestService>("test-service");
+        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
+        Assert.True(resolved);
         Assert.NotNull(service);
         Assert.IsType<TestService>(service);
     }
 
     [Fact]
-    public virtual void ResolveKeyed_UnregisteredKeyedType_ThrowsException()
+    public virtual void TryResolveWithType_UnregisteredType_ReturnsFalse()
     {
+        // Configure the dependoContainer with our container
         using var dependoContainer = ConfigureDependoContainer(() => { });
-        // Act & Assert
-        Assert.ThrowsAny<Exception>(() =>
-            dependoContainer.ResolveKeyed<ITestService>("test-service"));
-    }
-
-    [Fact]
-    public virtual void ResolveAllKeyed_MultipleKeyedInstances_ReturnsAllInstances()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-        {
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "test-services");
-            ContainerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
-        });
 
         // Act
-        var services = dependoContainer.ResolveAllKeyed<ITestService>("test-services").ToList();
+        bool resolved = dependoContainer.TryResolve(typeof(ITestService), out object? service);
 
         // Assert
-        Assert.Equal(2, services.Count);
-        Assert.Contains(services, s => s.GetType() == typeof(TestService));
-        Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
+        Assert.False(resolved);
+        Assert.Null(service);
     }
 
-    [Fact]
-    public virtual void Register_WithKeye_RegistersKeyedService()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.Register<ITestService, TestService>(ServiceLifetime.Singleton, "keyed-service"));
-
-        // Act
-        var service = dependoContainer.ResolveKeyed<ITestService>("keyed-service");
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.IsType<TestService>(service);
-    }
-
-    [Fact]
-    public virtual void RegisterSelf_WithKeye_RegistersKeyedService()
-    {
-        // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.RegisterSelf<TestService>(ServiceLifetime.Singleton, "keyed-service"));
-
-        // Act
-        var service = dependoContainer.ResolveKeyed<TestService>("keyed-service");
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.IsType<TestService>(service);
-    }
-
-    [Fact]
-    public virtual void RegisterInstance_WithKeye_RegistersKeyedInstance()
-    {
-        // Arrange
-        var instance = new TestService();
-        using var dependoContainer = ConfigureDependoContainer(() =>
-            ContainerBuilder.RegisterInstance<ITestService>(instance, "keyed-instance"));
-
-        // Act
-        var service = dependoContainer.ResolveKeyed<ITestService>("keyed-instance");
-
-        // Assert
-        Assert.NotNull(service);
-        Assert.Same(instance, service);
-    }
-
-
-
-
-
-
-
-
-
-
-    // Test interfaces and classes
-    public interface ITestService { }
-
-    public class TestService : ITestService { }
+    protected abstract TContainer ConfigureDependoContainer(Action registerServices);
 
     public class AnotherTestService : ITestService { }
 
     public class ConcreteService { }
+
+    public class TestService : ITestService { }
 }

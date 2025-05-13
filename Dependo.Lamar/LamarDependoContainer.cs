@@ -68,7 +68,7 @@ public class LamarDependoContainer : BaseDependoContainer
     public override T ResolveKeyed<T>(object key) where T : class =>
         _container == null
             ? throw new InvalidOperationException("Container is not initialized")
-            : ResolveNamed<T>(StringifyKey(key));
+            : ResolveNamed<T>(DependoHelper.StringifyKey(key));
 
     /// <inheritdoc />
     public override T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class =>
@@ -77,7 +77,7 @@ public class LamarDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAllKeyed<T>(object key) =>
         throw new NotSupportedException(
-            "Lamar does not support multiple keyed registrations of the same type. When registering, they get overriden. Call ResolveKeyed<T> instead");
+            "Lamar does not support multiple registrations of the same type and key. When registering, they get overriden. Call ResolveKeyed<T> instead");
 
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class =>
@@ -89,7 +89,7 @@ public class LamarDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException(
-            "Lamar does not support multiple named registrations of the same type. When registering, they get overriden. Call ResolveNamed<T> instead");
+            "Lamar does not support multiple registrations of the same type and name. When registering, they get overriden. Call ResolveNamed<T> instead");
 
     /// <inheritdoc />
     public override object ResolveUnregistered(Type type) =>
@@ -156,7 +156,11 @@ public class LamarDependoContainer : BaseDependoContainer
         }
 
         // Create container
+
+#pragma warning disable DF0100 // Should not be disposed here.
         var container = new Container(registry);
+#pragma warning restore DF0100
+
         return container;
     }
 

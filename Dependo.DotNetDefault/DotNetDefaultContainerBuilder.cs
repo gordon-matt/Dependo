@@ -22,84 +22,155 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     public IServiceCollection Services { get; }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            Services.Add(new ServiceDescriptor(
-                serviceType: serviceType,
-                implementationType: implementationType,
-                lifetime: lifetime,
-                serviceKey: name));
-        }
-
         Services.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class
         where TImplementation : class, TService
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            Services.Add(new ServiceDescriptor(
-                serviceType: typeof(TService),
-                implementationType: typeof(TImplementation),
-                lifetime: lifetime,
-                serviceKey: name));
-        }
-
         Services.Add(new ServiceDescriptor(typeof(TService), typeof(TImplementation), lifetime));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped, string? name = null)
+    public IContainerBuilder RegisterSelf<TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TImplementation : class
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            Services.Add(new ServiceDescriptor(
-                serviceType: typeof(TImplementation),
-                implementationType: typeof(TImplementation),
-                lifetime: lifetime,
-                serviceKey: name));
-        }
-
         Services.Add(new ServiceDescriptor(typeof(TImplementation), typeof(TImplementation), lifetime));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance<TService>(TService instance, string? name = null)
+    public IContainerBuilder RegisterInstance<TService>(TService instance)
         where TService : class
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            Services.Add(new ServiceDescriptor(
-                serviceType: typeof(TService),
-                instance: instance,
-                serviceKey: name));
-        }
-
         Services.Add(new ServiceDescriptor(typeof(TService), instance));
         return this;
     }
 
     /// <inheritdoc/>
-    public IContainerBuilder RegisterInstance(Type serviceType, object instance, string? name = null)
+    public IContainerBuilder RegisterInstance(Type serviceType, object instance)
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            Services.Add(new ServiceDescriptor(
-                serviceType: serviceType,
-                instance: instance,
-                serviceKey: name));
-        }
-
         Services.Add(new ServiceDescriptor(serviceType, instance));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterNamed(Type serviceType, Type implementationType, string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: serviceType,
+            implementationType: implementationType,
+            lifetime: lifetime,
+            serviceKey: name));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterNamed<TService, TImplementation>(string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: typeof(TService),
+            implementationType: typeof(TImplementation),
+            lifetime: lifetime,
+            serviceKey: name));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterSelfNamed<TImplementation>(string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TImplementation : class
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: typeof(TImplementation),
+            implementationType: typeof(TImplementation),
+            lifetime: lifetime,
+            serviceKey: name));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceNamed<TService>(TService instance, string name)
+        where TService : class
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: typeof(TService),
+            instance: instance,
+            serviceKey: name));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceNamed(Type serviceType, object instance, string name)
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: serviceType,
+            instance: instance,
+            serviceKey: name));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterKeyed(Type serviceType, Type implementationType, object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: serviceType,
+            implementationType: implementationType,
+            lifetime: lifetime,
+            serviceKey: key));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterKeyed<TService, TImplementation>(object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: typeof(TService),
+            implementationType: typeof(TImplementation),
+            lifetime: lifetime,
+            serviceKey: key));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterSelfKeyed<TImplementation>(object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TImplementation : class
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: typeof(TImplementation),
+            implementationType: typeof(TImplementation),
+            lifetime: lifetime,
+            serviceKey: key));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceKeyed<TService>(TService instance, object key)
+        where TService : class
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: typeof(TService),
+            instance: instance,
+            serviceKey: key));
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterInstanceKeyed(Type serviceType, object instance, object key)
+    {
+        Services.Add(new ServiceDescriptor(
+            serviceType: serviceType,
+            instance: instance,
+            serviceKey: key));
         return this;
     }
 }
