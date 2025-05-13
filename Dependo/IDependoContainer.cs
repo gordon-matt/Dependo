@@ -30,6 +30,31 @@ public interface IDependoContainer : IDisposable
     object Resolve(Type type);
 
     /// <summary>
+    /// Resolve keyed service
+    /// </summary>
+    /// <typeparam name="T">Type of service to resolve</typeparam>
+    /// <param name="key">Service key</param>
+    /// <returns>Resolved service</returns>
+    T ResolveKeyed<T>(object key) where T : class;
+
+    /// <summary>
+    /// Resolve keyed service of specified type with constructor arguments
+    /// </summary>
+    /// <typeparam name="T">Type of service to resolve</typeparam>
+    /// <param name="key">Service key</param>
+    /// <param name="ctorArgs">Constructor arguments</param>
+    /// <returns>Resolved service</returns>
+    T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class;
+
+    /// <summary>
+    /// Resolve all keyed services of the specified type
+    /// </summary>
+    /// <typeparam name="T">Type of services to resolve</typeparam>
+    /// <param name="name">Service key</param>
+    /// <returns>All resolved keyed services</returns>
+    IEnumerable<T> ResolveAllKeyed<T>(object key);
+
+    /// <summary>
     /// Resolve named service
     /// </summary>
     /// <typeparam name="T">Type of service to resolve</typeparam>

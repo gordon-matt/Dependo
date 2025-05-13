@@ -49,6 +49,7 @@ public class AutofacDependoContainer : BaseDependoContainer
 
     #region IDependoContainer Members
 
+    /// <inheritdoc />
     public override bool IsRegistered(Type serviceType) => _container.IsRegistered(serviceType);
 
     /// <inheritdoc />
@@ -84,6 +85,19 @@ public class AutofacDependoContainer : BaseDependoContainer
 
         return _container?.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
     }
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key) where T : class => _container.ResolveKeyed<T>(key);
+
+    /// <inheritdoc />
+    public override T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class
+    {
+        var ctorParams = ctorArgs.Select(x => new NamedParameter(x.Key, x.Value)).ToArray();
+        return _container.ResolveKeyed<T>(key, ctorParams);
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<T> ResolveAllKeyed<T>(object key) => _container.ResolveKeyed<IEnumerable<T>>(key);
 
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class
@@ -146,20 +160,6 @@ public class AutofacDependoContainer : BaseDependoContainer
     }
 
     #endregion IDependoContainer Members
-
-    #region See if these can be added to all implementations:
-
-    public T ResolveKeyed<T>(object key) where T : class =>  _container.ResolveKeyed<T>(key);
-
-    public T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class
-    {
-        var ctorParams = ctorArgs.Select(x => new NamedParameter(x.Key, x.Value)).ToArray();
-        return _container.ResolveKeyed<T>(key, ctorParams);
-    }
-
-    public IEnumerable<T> ResolveAllKeyed<T>(object key) => _container.ResolveKeyed<IEnumerable<T>>(key);
-
-    #endregion
 
     #region Non-Public Methods
 
