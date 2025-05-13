@@ -122,9 +122,13 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
         var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>()
             .Where(x => !typeof(IDependencyRegistrarAdapter).IsAssignableFrom(x));
 
+        // Find .NET Default-specific registrars to create adapters for them
+        var dotNetDefaultRegistrars = typeFinder.FindClassesOfType<IDotNetDefaultDependencyRegistrar>();
+
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
+            .Concat(dotNetDefaultRegistrars.Select(x => DotNetDefaultDependencyRegistrarAdapter.CreateFromType(x)))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies
