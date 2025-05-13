@@ -6,7 +6,7 @@ namespace Dependo.DotNetDefault;
 /// <summary>
 /// .NET Default implementation of the Dependo container
 /// </summary>
-public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
+public class DotNetDefaultDependoContainer : BaseDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -23,8 +23,6 @@ public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
     public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
 
     #endregion Properties
-
-    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -44,42 +42,48 @@ public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
         return ServiceProvider;
     }
 
+    #region IDependoContainer Members
+
+    public override bool IsRegistered(Type serviceType)
+    {
+        var serviceProviderIsService = ServiceProvider.GetService<IServiceProviderIsService>();
+        return serviceProviderIsService is null
+            ? throw new InvalidOperationException("IServiceProviderIsService is not available")
+            : serviceProviderIsService.IsService(serviceType);
+    }
+
     /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class =>
+    public override T Resolve<T>() where T : class =>
         ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
+    public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
         throw new NotSupportedException(".NET Default DI does not support passing constructor arguments");
 
     /// <inheritdoc />
-    public virtual object Resolve(Type type) =>
+    public override object Resolve(Type type) =>
         ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
 
     /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class =>
+    public override T ResolveNamed<T>(string name) where T : class =>
         throw new NotSupportedException(".NET Default DI does not support named services");
 
     /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
+    public override IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
 
     /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
+    public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException(".NET Default DI does not support named services");
 
     /// <inheritdoc />
-    public virtual object ResolveUnregistered(Type type) =>
-        throw new NotSupportedException(".NET Default DI does not support resolving unregistered services");
-
-    /// <inheritdoc />
-    public bool TryResolve<T>(out T? instance) where T : class
+    public override bool TryResolve<T>(out T? instance) where T : class
     {
         instance = ServiceProvider.GetService<T>();
         return instance != null;
     }
 
     /// <inheritdoc />
-    public bool TryResolve(Type serviceType, out object? instance)
+    public override bool TryResolve(Type serviceType, out object? instance)
     {
         instance = ServiceProvider.GetService(serviceType);
         return instance != null;
@@ -154,4 +158,4 @@ public class DotNetDefaultDependoContainer : IDependoContainer, IDisposable
     }
 
     #endregion IDisposable Members
-} 
+}

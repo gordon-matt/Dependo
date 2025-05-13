@@ -8,7 +8,7 @@ namespace Dependo.LightInject;
 /// <summary>
 /// LightInject implementation of the Dependo container
 /// </summary>
-public class LightInjectDependoContainer : IDependoContainer, IDisposable
+public class LightInjectDependoContainer : BaseDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -25,8 +25,6 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
 
     #endregion Properties
-
-    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -46,8 +44,21 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
         return ServiceProvider;
     }
 
+    #region IDependoContainer Members
+
+    public override bool IsRegistered(Type serviceType)
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        using var scope = _container.BeginScope();
+        return scope.GetInstance(serviceType) != null;
+    }
+
     /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class
+    public override T Resolve<T>() where T : class
     {
         if (_container == null)
         {
@@ -59,11 +70,11 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
+    public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
         throw new NotSupportedException("LightInject does not support passing constructor arguments");
 
     /// <inheritdoc />
-    public virtual object Resolve(Type type)
+    public override object Resolve(Type type)
     {
         if (_container == null)
         {
@@ -75,7 +86,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class
+    public override T ResolveNamed<T>(string name) where T : class
     {
         if (_container == null)
         {
@@ -87,7 +98,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>()
+    public override IEnumerable<T> ResolveAll<T>()
     {
         if (_container == null)
         {
@@ -99,7 +110,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
+    public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException(
             "LightInject does not support multiple named registrations of the same type. When registering, they get overriden. Call ResolveNamed<T> instead");
     //{
@@ -113,20 +124,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     //}
 
     /// <inheritdoc />
-    public virtual object ResolveUnregistered(Type type) =>
-        throw new NotSupportedException("LightInject does not support resolving unregistered services.");
-    //{
-    //    if (_container == null)
-    //    {
-    //        throw new InvalidOperationException("Container is not initialized");
-    //    }
-
-    //    using var scope = _container.BeginScope();
-    //    return scope.GetInstance(type);
-    //}
-
-    /// <inheritdoc />
-    public bool TryResolve<T>(out T? instance) where T : class
+    public override bool TryResolve<T>(out T? instance) where T : class
     {
         if (_container == null)
         {
@@ -148,7 +146,7 @@ public class LightInjectDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public bool TryResolve(Type serviceType, out object? instance)
+    public override bool TryResolve(Type serviceType, out object? instance)
     {
         if (_container == null)
         {

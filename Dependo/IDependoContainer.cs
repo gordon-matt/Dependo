@@ -5,6 +5,8 @@
 /// </summary>
 public interface IDependoContainer
 {
+    bool IsRegistered(Type serviceType);
+
     /// <summary>
     /// Resolve service of specified type
     /// </summary>

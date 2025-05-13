@@ -7,7 +7,7 @@ namespace Dependo.DryIoc;
 /// <summary>
 /// DryIoc implementation of the Dependo container
 /// </summary>
-public class DryIocDependoContainer : IDependoContainer, IDisposable
+public class DryIocDependoContainer : BaseDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -24,8 +24,6 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
     public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
 
     #endregion Properties
-
-    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -45,8 +43,12 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
         return ServiceProvider;
     }
 
+    #region IDependoContainer Members
+
+    public override bool IsRegistered(Type serviceType) => _container.IsRegistered(serviceType);
+
     /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class
+    public override T Resolve<T>() where T : class
     {
         if (_container == null)
         {
@@ -58,7 +60,7 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class
+    public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class
     {
         if (_container == null)
         {
@@ -72,7 +74,7 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public virtual object Resolve(Type type)
+    public override object Resolve(Type type)
     {
         if (_container == null)
         {
@@ -84,7 +86,7 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class
+    public override T ResolveNamed<T>(string name) where T : class
     {
         if (_container == null)
         {
@@ -96,7 +98,7 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>()
+    public override IEnumerable<T> ResolveAll<T>()
     {
         if (_container == null)
         {
@@ -108,30 +110,18 @@ public class DryIocDependoContainer : IDependoContainer, IDisposable
     }
 
     /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
+    public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException("DryIOC does not support multiple named registrations of the same type. When registering, an exception is thrown.");
 
-    //_container == null
-    //    ? throw new InvalidOperationException("Container is not initialized")
-    //    : _container.ResolveMany<T>(serviceKey: name);
-
     /// <inheritdoc />
-    public virtual object ResolveUnregistered(Type type) =>
-        throw new NotSupportedException("DryIOC does not support resolving unregistered services.");
-
-    //_container == null
-    //    ? throw new InvalidOperationException("Container is not initialized")
-    //    : _container.Resolve(type, IfUnresolved.Throw);
-
-    /// <inheritdoc />
-    public bool TryResolve<T>(out T instance) where T : class
+    public override bool TryResolve<T>(out T instance) where T : class
     {
         instance = _container!.Resolve<T>(IfUnresolved.ReturnDefault)!;
         return instance != default;
     }
 
     /// <inheritdoc />
-    public bool TryResolve(Type serviceType, out object instance)
+    public override bool TryResolve(Type serviceType, out object instance)
     {
         instance = _container!.Resolve(serviceType, IfUnresolved.ReturnDefault);
         return instance != default;

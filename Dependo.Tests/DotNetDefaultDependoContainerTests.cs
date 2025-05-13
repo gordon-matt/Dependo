@@ -130,9 +130,12 @@ public class DotNetDefaultDependoContainerTests
         // Arrange
         using var dependoContainer = ConfigureDependoContainer(() => { });
 
-        // Act & Assert
-        Assert.Throws<NotSupportedException>(() =>
-            dependoContainer.ResolveUnregistered(typeof(ConcreteService)));
+        // Act
+        object service = dependoContainer.ResolveUnregistered(typeof(ConcreteService));
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.IsType<ConcreteService>(service);
     }
 
     [Fact]
