@@ -1,5 +1,4 @@
 using Lamar;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +7,7 @@ namespace Dependo.Lamar;
 /// <summary>
 /// Lamar implementation of the Dependo container
 /// </summary>
-public class LamarDependoContainer : IDependoContainer, IDisposable
+public class LamarDependoContainer : BaseDependoContainer, IDisposable
 {
     #region Private Members
 
@@ -25,8 +24,6 @@ public class LamarDependoContainer : IDependoContainer, IDisposable
     public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
 
     #endregion Properties
-
-    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -46,43 +43,53 @@ public class LamarDependoContainer : IDependoContainer, IDisposable
         return ServiceProvider;
     }
 
+    #region IDependoContainer Members
+
+    public override bool IsRegistered(Type serviceType) =>
+        _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container.IsService(serviceType);
+
     /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class =>
+    public override T Resolve<T>() where T : class =>
         ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
+    public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
         throw new NotSupportedException("Lamar does not support passing constructor arguments");
 
     /// <inheritdoc />
-    public virtual object Resolve(Type type) =>
+    public override object Resolve(Type type) =>
         ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
 
     /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class =>
+    public override T ResolveNamed<T>(string name) where T : class =>
         _container == null ? throw new InvalidOperationException("Container is not initialized") : _container.GetInstance<T>(name);
 
     /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
+    public override IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
 
     /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
+    public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException(
             "Lamar does not support multiple named registrations of the same type. When registering, they get overriden. Call ResolveNamed<T> instead");
 
     /// <inheritdoc />
-    public virtual object ResolveUnregistered(Type type) =>
-        _container == null ? throw new InvalidOperationException("Container is not initialized") : _container.GetInstance(type);
+    public override object ResolveUnregistered(Type type) =>
+        _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container.GetInstance(type)
+                ?? base.ResolveUnregistered(type);
 
     /// <inheritdoc />
-    public bool TryResolve<T>(out T instance) where T : class
+    public override bool TryResolve<T>(out T instance) where T : class
     {
         instance = ServiceProvider.GetService<T>()!;
         return instance != null;
     }
 
     /// <inheritdoc />
-    public bool TryResolve(Type serviceType, out object instance)
+    public override bool TryResolve(Type serviceType, out object instance)
     {
         instance = ServiceProvider.GetService(serviceType)!;
         return instance != null;

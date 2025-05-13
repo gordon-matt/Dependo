@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
+using System.Xml.Linq;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.Extensions.Configuration;
 
 namespace Dependo.Autofac;
@@ -8,12 +10,12 @@ namespace Dependo.Autofac;
 /// <summary>
 /// Autofac implementation of the Dependo container
 /// </summary>
-public class AutofacDependoContainer : IDependoContainer, IDisposable
+public class AutofacDependoContainer : BaseDependoContainer, IDisposable
 {
     #region Private Members
 
-    private AutofacContainerManager? containerManager;
-    private bool disposed;
+    private IContainer _container;
+    private bool isDisposed;
 
     #endregion Private Members
 
@@ -25,8 +27,6 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
     public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
 
     #endregion Properties
-
-    #region IDependoContainer Members
 
     /// <summary>
     /// Configure services for the application
@@ -47,59 +47,119 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
         return ServiceProvider;
     }
 
-    /// <inheritdoc />
-    public virtual T Resolve<T>() where T : class =>
-        containerManager?.Resolve<T>() ?? throw new InvalidOperationException("Container manager is not initialized");
+    #region IDependoContainer Members
+
+    public override bool IsRegistered(Type serviceType) => _container.IsRegistered(serviceType);
 
     /// <inheritdoc />
-    public T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
-        containerManager?.Resolve<T>(ctorArgs) ?? throw new InvalidOperationException("Container manager is not initialized");
-
-    /// <inheritdoc />
-    public virtual object Resolve(Type type) =>
-        containerManager?.Resolve(type) ?? throw new InvalidOperationException("Container manager is not initialized");
-
-    /// <inheritdoc />
-    public T ResolveNamed<T>(string name) where T : class =>
-        containerManager?.ResolveNamed<T>(name) ?? throw new InvalidOperationException("Container manager is not initialized");
-
-    /// <inheritdoc />
-    public virtual IEnumerable<T> ResolveAll<T>() =>
-        containerManager?.ResolveAll<T>() ?? throw new InvalidOperationException("Container manager is not initialized");
-
-    /// <inheritdoc />
-    public IEnumerable<T> ResolveAllNamed<T>(string name) =>
-        containerManager?.ResolveAllNamed<T>(name) ?? throw new InvalidOperationException("Container manager is not initialized");
-
-    /// <inheritdoc />
-    public virtual object ResolveUnregistered(Type type) =>
-        containerManager?.ResolveUnregistered(type) ?? throw new InvalidOperationException("Container manager is not initialized");
-
-    /// <inheritdoc />
-    public bool TryResolve<T>(out T? instance) where T : class
+    public override T Resolve<T>() where T : class
     {
-        if (containerManager == null)
+        if (_container == null)
         {
-            instance = default!;
-            return false;
+            throw new InvalidOperationException("Container is not initialized");
         }
 
-        return containerManager.TryResolve(out instance);
+        return _container?.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
     }
 
     /// <inheritdoc />
-    public bool TryResolve(Type serviceType, out object? instance)
+    public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class
     {
-        if (containerManager == null)
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        var ctorParams = ctorArgs.Select(x => new NamedParameter(x.Key, x.Value)).ToArray();
+        return _container.Resolve<T>(ctorParams) ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+    }
+
+    /// <inheritdoc />
+    public override object Resolve(Type type)
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        return _container?.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+    }
+
+    /// <inheritdoc />
+    public override T ResolveNamed<T>(string name) where T : class
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        return _container?.ResolveNamed<T>(name)
+            ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name} with name '{name}'");
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<T> ResolveAll<T>()
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        return _container?.Resolve<IEnumerable<T>>()
+            ?? throw new InvalidOperationException($"Could not resolve any {typeof(T).Name}");
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<T> ResolveAllNamed<T>(string name)
+    {
+        if (_container == null)
+        {
+            throw new InvalidOperationException("Container is not initialized");
+        }
+
+        return _container?.ResolveNamed<IEnumerable<T>>(name)
+            ?? throw new InvalidOperationException($"Could not resolve any {typeof(T).Name} with name '{name}'");
+    }
+
+    /// <inheritdoc />
+    public override bool TryResolve<T>(out T? instance) where T : class
+    {
+        if (_container == null)
         {
             instance = default!;
             return false;
         }
 
-        return containerManager.TryResolve(serviceType, out instance);
+        return _container.TryResolve(out instance);
+    }
+
+    /// <inheritdoc />
+    public override bool TryResolve(Type serviceType, out object? instance)
+    {
+        if (_container == null)
+        {
+            instance = default!;
+            return false;
+        }
+
+        return _container.TryResolve(serviceType, out instance);
     }
 
     #endregion IDependoContainer Members
+
+    #region See if these can be added to all implementations:
+
+    public T ResolveKeyed<T>(object key) where T : class =>  _container.ResolveKeyed<T>(key);
+
+    public T ResolveKeyed<T>(object key, IDictionary<string, object> ctorArgs) where T : class
+    {
+        var ctorParams = ctorArgs.Select(x => new NamedParameter(x.Key, x.Value)).ToArray();
+        return _container.ResolveKeyed<T>(key, ctorParams);
+    }
+
+    public IEnumerable<T> ResolveAllKeyed<T>(object key) => _container.ResolveKeyed<IEnumerable<T>>(key);
+
+    #endregion
 
     #region Non-Public Methods
 
@@ -156,11 +216,12 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
         var container = containerBuilder.Build();
 #pragma warning restore DF0010 //
 
+        _container = container;
+
 #pragma warning disable DF0022 // Should not be disposed here.
         ServiceProvider = new AutofacServiceProvider(container);
 #pragma warning restore DF0022 //
 
-        containerManager = new AutofacContainerManager(container);
         return ServiceProvider;
     }
 
@@ -195,17 +256,17 @@ public class AutofacDependoContainer : IDependoContainer, IDisposable
     /// <param name="disposing">Indicates whether the method was called from Dispose()</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (disposed)
+        if (isDisposed)
         {
             return;
         }
 
         if (disposing)
         {
-            containerManager?.Dispose();
+            _container?.Dispose();
         }
 
-        disposed = true;
+        isDisposed = true;
     }
 
     #endregion IDisposable Members
