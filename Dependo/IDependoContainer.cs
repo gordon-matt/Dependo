@@ -3,7 +3,7 @@
 /// <summary>
 /// Interface for the Dependo container that serves as the main entry point for dependency resolution
 /// </summary>
-public interface IDependoContainer
+public interface IDependoContainer : IDisposable
 {
     bool IsRegistered(Type serviceType);
 

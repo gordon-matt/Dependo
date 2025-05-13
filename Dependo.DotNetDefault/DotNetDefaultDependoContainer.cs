@@ -6,7 +6,7 @@ namespace Dependo.DotNetDefault;
 /// <summary>
 /// .NET Default implementation of the Dependo container
 /// </summary>
-public class DotNetDefaultDependoContainer : BaseDependoContainer, IDisposable
+public class DotNetDefaultDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
@@ -66,14 +66,13 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer, IDisposable
 
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class =>
-        throw new NotSupportedException(".NET Default DI does not support named services");
+        ServiceProvider.GetKeyedService<T>(name) ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAll<T>() => ServiceProvider.GetServices<T>();
 
     /// <inheritdoc />
-    public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
-        throw new NotSupportedException(".NET Default DI does not support named services");
+    public override IEnumerable<T> ResolveAllNamed<T>(string name) => ServiceProvider.GetKeyedServices<T>(name);
 
     /// <inheritdoc />
     public override bool TryResolve<T>(out T? instance) where T : class
@@ -129,7 +128,7 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer, IDisposable
     #region IDisposable Members
 
     /// <inheritdoc />
-    public void Dispose()
+    public override void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);

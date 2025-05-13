@@ -10,7 +10,7 @@ namespace Dependo.Autofac;
 /// <summary>
 /// Autofac implementation of the Dependo container
 /// </summary>
-public class AutofacDependoContainer : BaseDependoContainer, IDisposable
+public class AutofacDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
@@ -244,7 +244,7 @@ public class AutofacDependoContainer : BaseDependoContainer, IDisposable
     #region IDisposable Members
 
     /// <inheritdoc />
-    public void Dispose()
+    public override void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);

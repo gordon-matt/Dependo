@@ -7,7 +7,7 @@ namespace Dependo.DryIoc;
 /// <summary>
 /// DryIoc implementation of the Dependo container
 /// </summary>
-public class DryIocDependoContainer : BaseDependoContainer, IDisposable
+public class DryIocDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
@@ -174,7 +174,7 @@ public class DryIocDependoContainer : BaseDependoContainer, IDisposable
     #region IDisposable Members
 
     /// <inheritdoc />
-    public void Dispose()
+    public override void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
