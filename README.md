@@ -13,13 +13,13 @@ Check the demo project for a clearer idea on how to use Dependo.
 
 > Dependo.Autofac: https://www.nuget.org/packages/Dependo.Autofac/
 
-> Dependo.DotNetDefault: coming soon.
+> Dependo.DotNetDefault: https://www.nuget.org/packages/Dependo.DotNetDefault/
 
-> Dependo.DryIoc: coming soon.
+> Dependo.DryIoc: https://www.nuget.org/packages/Dependo.DryIoc/
 
-> Dependo.Lamar: coming soon.
+> Dependo.Lamar: https://www.nuget.org/packages/Dependo.Lamar/
 
-> Dependo.LightInject: coming soon.
+> Dependo.LightInject: Coming soon...
 
 ## Feature Support
 
