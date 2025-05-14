@@ -39,6 +39,9 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
         return serviceContainer;
     }
 
+    // TODO: This is only partally working. There are still some issues using it with ASP.NET. Example exception:
+    // "ApplicationServices must not be null. This is normally set automatically via IConfigureOptions"
+    // Awaiting proper solution: https://github.com/seesharper/LightInject.Microsoft.DependencyInjection/issues/214
     public static void InvokeRegisterServices(object container, object rootScope, IServiceCollection serviceCollection)
     {
         // Get the type containing the private method
