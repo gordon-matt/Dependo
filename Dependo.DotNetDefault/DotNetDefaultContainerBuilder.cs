@@ -29,6 +29,13 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
     }
 
     /// <inheritdoc/>
+    public IContainerBuilder RegisterGeneric(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        Services.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
+        return this;
+    }
+
+    /// <inheritdoc/>
     public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class
         where TImplementation : class, TService

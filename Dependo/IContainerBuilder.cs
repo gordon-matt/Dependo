@@ -17,6 +17,15 @@ public interface IContainerBuilder
     IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped);
 
     /// <summary>
+    /// Registers an open generic type as a service with implementation
+    /// </summary>
+    /// <param name="serviceType">Service type</param>
+    /// <param name="implementationType">Implementation type</param>
+    /// <param name="lifetime">Service lifetime</param>
+    /// <returns>Container builder for chaining</returns>
+    IContainerBuilder RegisterGeneric(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped);
+
+    /// <summary>
     /// Registers a service type with implementation
     /// </summary>
     /// <typeparam name="TService">Service type</typeparam>

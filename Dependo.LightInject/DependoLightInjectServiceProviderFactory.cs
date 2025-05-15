@@ -12,7 +12,7 @@ namespace Dependo.LightInject;
 public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<ServiceContainer>
 {
     private readonly Action<ServiceContainer> configurationAction;
-    private IServiceCollection? services;
+    protected IServiceCollection? services;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DependoLightInjectServiceProviderFactory"/> class.
@@ -28,7 +28,7 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
     /// </summary>
     /// <param name="services">The collection of services.</param>
     /// <returns>A container that can be used to create an <see cref="IServiceProvider"/>.</returns>
-    public ServiceContainer CreateBuilder(IServiceCollection services)
+    public virtual ServiceContainer CreateBuilder(IServiceCollection services)
     {
         this.services = services;
 
@@ -64,7 +64,7 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
     /// <param name="container">The container.</param>
     /// <returns>An <see cref="IServiceProvider"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when container is null.</exception>
-    public IServiceProvider CreateServiceProvider(ServiceContainer container)
+    public virtual IServiceProvider CreateServiceProvider(ServiceContainer container)
     {
         if (container == null)
         {

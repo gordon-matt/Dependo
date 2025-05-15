@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.DotNetDefault;
 
@@ -17,5 +18,5 @@ public interface IDotNetDefaultDependencyRegistrar : IDependencyRegistrarAdapter
     /// </summary>
     /// <param name="builder">Container builder</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(IServiceCollection services, ITypeFinder typeFinder);
+    void Register(IServiceCollection services, ITypeFinder typeFinder, IConfiguration configuration);
 }

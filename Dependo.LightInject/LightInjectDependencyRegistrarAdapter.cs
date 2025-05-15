@@ -24,10 +24,13 @@ public class LightInjectDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     /// <inheritdoc/>
     public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
+        // First handle any registrations made via the generic IDependencyRegistrar interface
+        _lightInjectRegistrar.Register(builder, typeFinder, configuration);
+
         // Extract the LightInject container if possible
         if (builder is LightInjectContainerBuilder lightInjectBuilder)
         {
-            _lightInjectRegistrar.Register(lightInjectBuilder.NativeContainer, typeFinder);
+            _lightInjectRegistrar.Register(lightInjectBuilder.NativeContainer, typeFinder, configuration);
         }
     }
 

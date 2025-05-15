@@ -11,7 +11,7 @@ namespace Dependo.Autofac;
 public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
 {
     private readonly Action<ContainerBuilder> configurationAction;
-    private IServiceCollection? services;
+    protected IServiceCollection? services;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DependoAutofacServiceProviderFactory"/> class.
@@ -27,7 +27,7 @@ public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<Cont
     /// </summary>
     /// <param name="services">The collection of services.</param>
     /// <returns>A container builder that can be used to create an <see cref="IServiceProvider"/>.</returns>
-    public ContainerBuilder CreateBuilder(IServiceCollection services)
+    public virtual ContainerBuilder CreateBuilder(IServiceCollection services)
     {
         this.services = services;
 
@@ -43,7 +43,7 @@ public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<Cont
     /// <param name="containerBuilder">The container builder.</param>
     /// <returns>An <see cref="IServiceProvider"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when containerBuilder is null.</exception>
-    public IServiceProvider CreateServiceProvider(ContainerBuilder containerBuilder)
+    public virtual IServiceProvider CreateServiceProvider(ContainerBuilder containerBuilder)
     {
         if (containerBuilder == null)
         {
@@ -72,7 +72,9 @@ public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<Cont
         var serviceProvider = dependoContainer.ConfigureServices(containerBuilder, configuration!);
 
         // Set dependo container as the singleton instance
+#pragma warning disable DF0001 // Should not be disposed here.
         DependoResolver.Create(dependoContainer);
+#pragma warning restore DF0001
 
         return serviceProvider;
     }

@@ -9,7 +9,7 @@ namespace Dependo.DotNetDefault;
 public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
 {
     private readonly Action<IServiceCollection> configurationAction;
-    private IServiceCollection? services;
+    protected IServiceCollection? services;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DependoDotNetDefaultServiceProviderFactory"/> class.
@@ -25,7 +25,7 @@ public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactor
     /// </summary>
     /// <param name="services">The collection of services.</param>
     /// <returns>A service collection that can be used to create an <see cref="IServiceProvider"/>.</returns>
-    public IServiceCollection CreateBuilder(IServiceCollection services)
+    public virtual IServiceCollection CreateBuilder(IServiceCollection services)
     {
         this.services = services;
         configurationAction(services);
@@ -38,7 +38,7 @@ public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactor
     /// <param name="serviceCollection">The service collection.</param>
     /// <returns>An <see cref="IServiceProvider"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when serviceCollection is null.</exception>
-    public IServiceProvider CreateServiceProvider(IServiceCollection serviceCollection)
+    public virtual IServiceProvider CreateServiceProvider(IServiceCollection serviceCollection)
     {
         if (serviceCollection == null)
         {

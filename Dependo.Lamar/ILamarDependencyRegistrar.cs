@@ -1,4 +1,5 @@
 using Lamar;
+using Microsoft.Extensions.Configuration;
 
 namespace Dependo.Lamar;
 
@@ -17,5 +18,5 @@ public interface ILamarDependencyRegistrar : IDependencyRegistrarAdapter
     /// </summary>
     /// <param name="registry">Service registry</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(ServiceRegistry registry, ITypeFinder typeFinder);
+    void Register(ServiceRegistry registry, ITypeFinder typeFinder, IConfiguration configuration);
 }

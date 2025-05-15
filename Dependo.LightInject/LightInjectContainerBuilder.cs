@@ -38,6 +38,21 @@ public class LightInjectContainerBuilder : IContainerBuilder
     }
 
     /// <inheritdoc/>
+    public IContainerBuilder RegisterGeneric(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        var lifetimeType = GetLifetime(lifetime);
+        if (lifetimeType != null)
+        {
+            NativeContainer.Register(serviceType, implementationType, lifetimeType);
+        }
+        else
+        {
+            NativeContainer.Register(serviceType, implementationType);
+        }
+        return this;
+    }
+
+    /// <inheritdoc/>
     public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class
         where TImplementation : class, TService

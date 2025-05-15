@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Microsoft.Extensions.Configuration;
 
 namespace Dependo.Autofac;
 
@@ -17,5 +18,5 @@ public interface IAutofacDependencyRegistrar : IDependencyRegistrarAdapter
     /// </summary>
     /// <param name="builder">Container builder</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(ContainerBuilder builder, ITypeFinder typeFinder);
+    void Register(ContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration);
 }

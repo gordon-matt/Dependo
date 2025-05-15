@@ -24,10 +24,13 @@ public class DryIocDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     /// <inheritdoc/>
     public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
+        // First handle any registrations made via the generic IDependencyRegistrar interface
+        _dryIocRegistrar.Register(builder, typeFinder, configuration);
+
         // Extract the DryIoc container if possible
         if (builder is DryIocContainerBuilder dryIocBuilder)
         {
-            _dryIocRegistrar.Register(dryIocBuilder.NativeContainer, typeFinder);
+            _dryIocRegistrar.Register(dryIocBuilder.NativeContainer, typeFinder, configuration);
         }
     }
 
