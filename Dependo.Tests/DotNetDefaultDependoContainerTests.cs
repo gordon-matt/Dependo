@@ -21,7 +21,7 @@ public class DotNetDefaultDependoContainerTests : DependoContainerTestsBase<DotN
     {
         registerServices();
         var dependoContainer = new DotNetDefaultDependoContainer();
-        dependoContainer.ConfigureServices(serviceCollection, new Mock<IConfigurationRoot>().Object);
+        dependoContainer.ConfigureServices(serviceCollection, new Mock<IConfiguration>().Object);
         return dependoContainer;
     }
 

@@ -22,7 +22,7 @@ public class LamarDependoContainerTests : DependoContainerTestsBase<LamarDependo
     {
         registerServices();
         var dependoContainer = new LamarDependoContainer();
-        dependoContainer.ConfigureServices(serviceRegistry, new Mock<IConfigurationRoot>().Object);
+        dependoContainer.ConfigureServices(serviceRegistry, new Mock<IConfiguration>().Object);
         return dependoContainer;
     }
 

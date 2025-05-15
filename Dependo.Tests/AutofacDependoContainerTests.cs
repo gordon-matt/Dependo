@@ -21,7 +21,7 @@ public class AutofacDependoContainerTests : DependoContainerTestsBase<AutofacDep
     {
         registerServices();
         var dependoContainer = new AutofacDependoContainer();
-        dependoContainer.ConfigureServices(autofacContainerBuilder, new Mock<IConfigurationRoot>().Object);
+        dependoContainer.ConfigureServices(autofacContainerBuilder, new Mock<IConfiguration>().Object);
         return dependoContainer;
     }
 }

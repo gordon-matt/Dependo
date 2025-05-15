@@ -44,10 +44,7 @@ public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<ICont
     /// <exception cref="ArgumentNullException">Thrown when container is null.</exception>
     public virtual IServiceProvider CreateServiceProvider(IContainer container)
     {
-        if (container == null)
-        {
-            throw new ArgumentNullException(nameof(container));
-        }
+        ArgumentNullException.ThrowIfNull(container);
 
         if (_services == null)
         {
@@ -59,7 +56,7 @@ public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<ICont
         var provider = _services.BuildServiceProvider();
 #pragma warning restore DF0010
 
-        var configuration = provider.GetService<IConfigurationRoot>();
+        var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container
 #pragma warning disable DF0010 // Should not be disposed here.

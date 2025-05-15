@@ -77,7 +77,7 @@ public class AutofacContainerBuilder : IContainerBuilder
     /// <inheritdoc/>
     public IContainerBuilder RegisterNamed(Type serviceType, Type implementationType, string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        var registration = NativeBuilder.RegisterType(implementationType).Named(name, serviceType);
+        var registration = NativeBuilder.RegisterType(implementationType).As(serviceType).Named(name, serviceType);
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -87,7 +87,7 @@ public class AutofacContainerBuilder : IContainerBuilder
         where TService : class
         where TImplementation : class, TService
     {
-        var registration = NativeBuilder.RegisterType<TImplementation>().Named<TService>(name);
+        var registration = NativeBuilder.RegisterType<TImplementation>().As<TService>().Named<TService>(name);
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -119,7 +119,7 @@ public class AutofacContainerBuilder : IContainerBuilder
     /// <inheritdoc/>
     public IContainerBuilder RegisterKeyed(Type serviceType, Type implementationType, object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        var registration = NativeBuilder.RegisterType(implementationType).Keyed(key, serviceType);
+        var registration = NativeBuilder.RegisterType(implementationType).As(serviceType).Keyed(key, serviceType);
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -129,7 +129,7 @@ public class AutofacContainerBuilder : IContainerBuilder
         where TService : class
         where TImplementation : class, TService
     {
-        var registration = NativeBuilder.RegisterType<TImplementation>().Keyed<TService>(key);
+        var registration = NativeBuilder.RegisterType<TImplementation>().As<TService>().Keyed<TService>(key);
         ApplyLifetime(registration, lifetime);
         return this;
     }

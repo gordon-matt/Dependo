@@ -23,16 +23,16 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Host
     // Configure Dependo for whichever container you want to use
-    .UseServiceProviderFactory(new DependoDotNetDefaultServiceProviderFactory())
-    .ConfigureContainer<IServiceCollection>(container =>
-    {
-        // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
-    });
-    //.UseServiceProviderFactory(new DependoAutofacServiceProviderFactory())
-    //.ConfigureContainer<ContainerBuilder>(container =>
+    //.UseServiceProviderFactory(new DependoDotNetDefaultServiceProviderFactory())
+    //.ConfigureContainer<IServiceCollection>(container =>
     //{
     //    // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
     //});
+    .UseServiceProviderFactory(new DependoAutofacServiceProviderFactory())
+    .ConfigureContainer<ContainerBuilder>(container =>
+    {
+        // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
+    });
     //.UseServiceProviderFactory(new DependoDryIocServiceProviderFactory())
     //.ConfigureContainer<DryIoc.Container>(container =>
     // {

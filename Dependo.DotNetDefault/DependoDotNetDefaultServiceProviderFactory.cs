@@ -55,7 +55,7 @@ public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactor
         var provider = services.BuildServiceProvider();
 #pragma warning restore DF0010
 
-        var configuration = provider.GetService<IConfigurationRoot>();
+        var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container
 #pragma warning disable DF0010 // Should not be disposed here.
