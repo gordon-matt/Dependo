@@ -11,7 +11,6 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
-    private IServiceProvider? _serviceProvider;
     private bool _disposed;
 
     #endregion Private Members
@@ -21,7 +20,7 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
     /// <summary>
     /// Gets or sets service provider
     /// </summary>
-    public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
+    public virtual IServiceProvider ServiceProvider { get; protected set; } = default!;
 
     #endregion Properties
 
@@ -38,8 +37,6 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
 
         // Register dependencies
         ServiceProvider = RegisterDependencies(services, typeFinder, configuration);
-        _serviceProvider = ServiceProvider;
-
         return ServiceProvider;
     }
 
@@ -164,7 +161,7 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
 
         if (disposing)
         {
-            if (_serviceProvider is IDisposable disposable)
+            if (ServiceProvider is IDisposable disposable)
             {
                 disposable.Dispose();
             }

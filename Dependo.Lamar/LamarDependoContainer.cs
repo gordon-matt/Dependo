@@ -12,7 +12,7 @@ public class LamarDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
-    private Container? _container;
+    protected Container? _container;
     private bool _disposed;
 
     #endregion Private Members
@@ -22,25 +22,24 @@ public class LamarDependoContainer : BaseDependoContainer
     /// <summary>
     /// Gets or sets service provider
     /// </summary>
-    public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
+    public virtual IServiceProvider ServiceProvider { get; protected set; } = default!;
 
     #endregion Properties
 
     /// <summary>
     /// Configure services for the application
     /// </summary>
-    /// <param name="services">Service collection</param>
+    /// <param name="serviceRegistry">Service collection</param>
     /// <param name="configuration">Configuration root of the application</param>
     /// <returns>Service provider</returns>
-    public virtual IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    public virtual IServiceProvider ConfigureServices(ServiceRegistry serviceRegistry, IConfiguration configuration)
     {
         // Find startup configurations provided by other assemblies
         var typeFinder = new WebAppTypeFinder();
 
         // Register dependencies
-        _container = RegisterDependencies(services, typeFinder, configuration) as Container;
+        _container = RegisterDependencies(serviceRegistry, typeFinder, configuration) as Container;
         ServiceProvider = _container!;
-
         return ServiceProvider;
     }
 
@@ -119,22 +118,18 @@ public class LamarDependoContainer : BaseDependoContainer
     /// <summary>
     /// Register dependencies
     /// </summary>
-    /// <param name="services">Service collection</param>
+    /// <param name="serviceRegistry">Service collection</param>
     /// <param name="typeFinder">Type finder</param>
-    protected virtual IServiceProvider RegisterDependencies(IServiceCollection services, ITypeFinder typeFinder, IConfiguration configuration)
+    protected virtual IServiceProvider RegisterDependencies(ServiceRegistry serviceRegistry, ITypeFinder typeFinder, IConfiguration configuration)
     {
         // Register dependo container
-        services.AddSingleton<IDependoContainer>(this);
+        serviceRegistry.AddSingleton<IDependoContainer>(this);
 
         // Register type finder
-        services.AddSingleton(typeFinder);
-
-        // Create a Lamar registry
-        var registry = new ServiceRegistry();
-        registry.AddRange(services);
+        serviceRegistry.AddSingleton(typeFinder);
 
         // Create a Lamar container builder abstraction
-        var builder = new LamarContainerBuilder(registry);
+        var builder = new LamarContainerBuilder(serviceRegistry);
 
         // Find dependency registrars provided by other assemblies
         var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyRegistrar>()
@@ -158,7 +153,7 @@ public class LamarDependoContainer : BaseDependoContainer
         // Create container
 
 #pragma warning disable DF0100 // Should not be disposed here.
-        var container = new Container(registry);
+        var container = new Container(serviceRegistry);
 #pragma warning restore DF0100
 
         return container;

@@ -75,6 +75,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             implementationType: implementationType,
             lifetime: lifetime,
             serviceKey: name));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register(serviceType, implementationType, lifetime);
+
         return this;
     }
 
@@ -88,6 +92,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             implementationType: typeof(TImplementation),
             lifetime: lifetime,
             serviceKey: name));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register<TService, TImplementation>(lifetime);
+
         return this;
     }
 
@@ -100,6 +108,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             implementationType: typeof(TImplementation),
             lifetime: lifetime,
             serviceKey: name));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterSelf<TImplementation>(lifetime);
+
         return this;
     }
 
@@ -111,6 +123,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             serviceType: typeof(TService),
             instance: instance,
             serviceKey: name));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(instance);
+
         return this;
     }
 
@@ -121,6 +137,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             serviceType: serviceType,
             instance: instance,
             serviceKey: name));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(serviceType, instance);
+
         return this;
     }
 
@@ -132,6 +152,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             implementationType: implementationType,
             lifetime: lifetime,
             serviceKey: key));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register(serviceType, implementationType, lifetime);
+
         return this;
     }
 
@@ -145,6 +169,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             implementationType: typeof(TImplementation),
             lifetime: lifetime,
             serviceKey: key));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register<TService, TImplementation>(lifetime);
+
         return this;
     }
 
@@ -157,6 +185,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             implementationType: typeof(TImplementation),
             lifetime: lifetime,
             serviceKey: key));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterSelf<TImplementation>(lifetime);
+
         return this;
     }
 
@@ -168,6 +200,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             serviceType: typeof(TService),
             instance: instance,
             serviceKey: key));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(instance);
+
         return this;
     }
 
@@ -178,6 +214,10 @@ public class DotNetDefaultContainerBuilder : IContainerBuilder
             serviceType: serviceType,
             instance: instance,
             serviceKey: key));
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(serviceType, instance);
+
         return this;
     }
 }
