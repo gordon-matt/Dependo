@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Builder;
+using Autofac.Features.OpenGenerics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.Autofac;
@@ -27,6 +28,14 @@ public class AutofacContainerBuilder : IContainerBuilder
     public IContainerBuilder Register(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         var registration = NativeBuilder.RegisterType(implementationType).As(serviceType);
+        ApplyLifetime(registration, lifetime);
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterGeneric(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        var registration = NativeBuilder.RegisterGeneric(implementationType).As(serviceType);
         ApplyLifetime(registration, lifetime);
         return this;
     }
@@ -149,7 +158,23 @@ public class AutofacContainerBuilder : IContainerBuilder
         return this;
     }
 
-    private void ApplyLifetime(IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> registration, ServiceLifetime lifetime)
+    private void ApplyLifetime(IRegistrationBuilder<object, ReflectionActivatorData, SingleRegistrationStyle> registration, ServiceLifetime lifetime)
+    {
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                registration.SingleInstance();
+                break;
+            case ServiceLifetime.Scoped:
+                registration.InstancePerLifetimeScope();
+                break;
+            case ServiceLifetime.Transient:
+                registration.InstancePerDependency();
+                break;
+        }
+    }
+
+    private void ApplyLifetime(IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> registration, ServiceLifetime lifetime)
     {
         switch (lifetime)
         {

@@ -10,7 +10,7 @@ namespace Dependo.Lamar;
 public class DependoLamarServiceProviderFactory : IServiceProviderFactory<ServiceRegistry>
 {
     private readonly Action<ServiceRegistry> configurationAction;
-    private IServiceCollection? services;
+    protected IServiceCollection? services;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DependoLamarServiceProviderFactory"/> class.
@@ -26,7 +26,7 @@ public class DependoLamarServiceProviderFactory : IServiceProviderFactory<Servic
     /// </summary>
     /// <param name="services">The collection of services.</param>
     /// <returns>A service registry that can be used to create an <see cref="IServiceProvider"/>.</returns>
-    public ServiceRegistry CreateBuilder(IServiceCollection services)
+    public virtual ServiceRegistry CreateBuilder(IServiceCollection services)
     {
         this.services = services;
 
@@ -42,7 +42,7 @@ public class DependoLamarServiceProviderFactory : IServiceProviderFactory<Servic
     /// <param name="serviceRegistry">The service registry.</param>
     /// <returns>An <see cref="IServiceProvider"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when serviceRegistry is null.</exception>
-    public IServiceProvider CreateServiceProvider(ServiceRegistry serviceRegistry)
+    public virtual IServiceProvider CreateServiceProvider(ServiceRegistry serviceRegistry)
     {
         if (serviceRegistry == null)
         {

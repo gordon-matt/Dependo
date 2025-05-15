@@ -11,7 +11,7 @@ namespace Dependo.DryIoc;
 public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<IContainer>
 {
     private readonly Action<IContainer> _configurationAction;
-    private IServiceCollection? _services;
+    protected IServiceCollection? _services;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DependoDryIocServiceProviderFactory"/> class.
@@ -27,7 +27,7 @@ public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<ICont
     /// </summary>
     /// <param name="services">The collection of services.</param>
     /// <returns>A container that can be used to create an <see cref="IServiceProvider"/>.</returns>
-    public IContainer CreateBuilder(IServiceCollection services)
+    public virtual IContainer CreateBuilder(IServiceCollection services)
     {
         _services = services;
 
@@ -42,7 +42,7 @@ public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<ICont
     /// <param name="container">The container.</param>
     /// <returns>An <see cref="IServiceProvider"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when container is null.</exception>
-    public IServiceProvider CreateServiceProvider(IContainer container)
+    public virtual IServiceProvider CreateServiceProvider(IContainer container)
     {
         if (container == null)
         {

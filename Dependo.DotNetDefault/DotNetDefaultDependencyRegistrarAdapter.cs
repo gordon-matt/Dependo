@@ -25,10 +25,13 @@ public class DotNetDefaultDependencyRegistrarAdapter : IDependencyRegistrarAdapt
     /// <inheritdoc/>
     public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
+        // First handle any registrations made via the generic IDependencyRegistrar interface
+        _dotNetDefaultRegistrar.Register(builder, typeFinder, configuration);
+
         // Extract the .NET Default service collection if possible
         if (builder is DotNetDefaultContainerBuilder dotNetDefaultBuilder)
         {
-            _dotNetDefaultRegistrar.Register(dotNetDefaultBuilder.Services, typeFinder);
+            _dotNetDefaultRegistrar.Register(dotNetDefaultBuilder.Services, typeFinder, configuration);
         }
     }
 

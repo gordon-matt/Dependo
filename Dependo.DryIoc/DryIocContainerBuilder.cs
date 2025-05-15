@@ -29,6 +29,14 @@ public class DryIocContainerBuilder : IContainerBuilder
         return this;
     }
 
+    // https://github.com/dadhi/DryIoc/blob/master/docs/DryIoc.Docs/OpenGenerics.md
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterGeneric(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime));
+        return this;
+    }
+
     /// <inheritdoc/>
     public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class

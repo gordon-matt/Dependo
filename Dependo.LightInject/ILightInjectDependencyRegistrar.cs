@@ -1,4 +1,5 @@
 using LightInject;
+using Microsoft.Extensions.Configuration;
 
 namespace Dependo.LightInject;
 
@@ -17,5 +18,5 @@ public interface ILightInjectDependencyRegistrar : IDependencyRegistrarAdapter
     /// </summary>
     /// <param name="container">Service container</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(IServiceContainer container, ITypeFinder typeFinder);
+    void Register(IServiceContainer container, ITypeFinder typeFinder, IConfiguration configuration);
 } 

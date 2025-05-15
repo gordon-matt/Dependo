@@ -1,4 +1,5 @@
 using DryIoc;
+using Microsoft.Extensions.Configuration;
 
 namespace Dependo.DryIoc;
 
@@ -17,5 +18,5 @@ public interface IDryIocDependencyRegistrar : IDependencyRegistrarAdapter
     /// </summary>
     /// <param name="container">DryIoc container</param>
     /// <param name="typeFinder">Type finder to help registration</param>
-    void Register(IContainer container, ITypeFinder typeFinder);
+    void Register(IContainer container, ITypeFinder typeFinder, IConfiguration configuration);
 }

@@ -24,10 +24,13 @@ public class AutofacDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     /// <inheritdoc/>
     public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
+        // First handle any registrations made via the generic IDependencyRegistrar interface
+        _autofacRegistrar.Register(builder, typeFinder, configuration);
+
         // Extract the Autofac container builder if possible
         if (builder is AutofacContainerBuilder autofacBuilder)
         {
-            _autofacRegistrar.Register(autofacBuilder.NativeBuilder, typeFinder);
+            _autofacRegistrar.Register(autofacBuilder.NativeBuilder, typeFinder, configuration);
         }
     }
 

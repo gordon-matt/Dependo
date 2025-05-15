@@ -34,6 +34,15 @@ public class LamarContainerBuilder : IContainerBuilder
         return this;
     }
 
+    // https://jasperfx.github.io/lamar/documentation/ioc/generics/#sec1
+    /// <inheritdoc/>
+    public IContainerBuilder RegisterGeneric(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        var registration = NativeRegistry.For(serviceType).Use(implementationType);
+        registration.Lifetime = GetLifetime(lifetime);
+        return this;
+    }
+
     /// <inheritdoc/>
     public IContainerBuilder Register<TService, TImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TService : class

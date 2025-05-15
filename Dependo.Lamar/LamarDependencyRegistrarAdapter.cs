@@ -24,10 +24,13 @@ public class LamarDependencyRegistrarAdapter : IDependencyRegistrarAdapter
     /// <inheritdoc/>
     public void Register(IContainerBuilder builder, ITypeFinder typeFinder, IConfiguration configuration)
     {
+        // First handle any registrations made via the generic IDependencyRegistrar interface
+        _lamarRegistrar.Register(builder, typeFinder, configuration);
+
         // Extract the Lamar service registry if possible
         if (builder is LamarContainerBuilder lamarBuilder)
         {
-            _lamarRegistrar.Register(lamarBuilder.NativeRegistry, typeFinder);
+            _lamarRegistrar.Register(lamarBuilder.NativeRegistry, typeFinder, configuration);
         }
     }
 
