@@ -3,7 +3,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <Description>Lamar implementation for Dependo</Description>
   </PropertyGroup>
   <ItemGroup>
