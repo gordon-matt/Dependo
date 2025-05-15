@@ -61,7 +61,7 @@ public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<Cont
         var provider = services.BuildServiceProvider();
 #pragma warning restore DF0010
 
-        var configuration = provider.GetService<IConfigurationRoot>();
+        var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container and create service provider
 

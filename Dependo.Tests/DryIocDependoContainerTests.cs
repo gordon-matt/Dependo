@@ -22,7 +22,7 @@ public class DryIocDependoContainerTests : DependoContainerTestsBase<DryIocDepen
     {
         registerServices();
         var dependoContainer = new DryIocDependoContainer();
-        dependoContainer.ConfigureServices(container, new Mock<IConfigurationRoot>().Object);
+        dependoContainer.ConfigureServices(container, new Mock<IConfiguration>().Object);
         return dependoContainer;
     }
 

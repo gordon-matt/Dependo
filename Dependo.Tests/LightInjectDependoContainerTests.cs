@@ -22,7 +22,7 @@ public class LightInjectDependoContainerTests : DependoContainerTestsBase<LightI
     {
         registerServices();
         var dependoContainer = new LightInjectDependoContainer();
-        dependoContainer.ConfigureServices(serviceContainer, new Mock<IConfigurationRoot>().Object);
+        dependoContainer.ConfigureServices(serviceContainer, new Mock<IConfiguration>().Object);
         return dependoContainer;
     }
 
