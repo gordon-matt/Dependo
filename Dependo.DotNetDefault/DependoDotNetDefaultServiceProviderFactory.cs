@@ -40,10 +40,7 @@ public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactor
     /// <exception cref="ArgumentNullException">Thrown when serviceCollection is null.</exception>
     public virtual IServiceProvider CreateServiceProvider(IServiceCollection serviceCollection)
     {
-        if (serviceCollection == null)
-        {
-            throw new ArgumentNullException(nameof(serviceCollection));
-        }
+        ArgumentNullException.ThrowIfNull(serviceCollection);
 
         if (services == null)
         {

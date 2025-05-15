@@ -44,10 +44,7 @@ public class DependoLamarServiceProviderFactory : IServiceProviderFactory<Servic
     /// <exception cref="ArgumentNullException">Thrown when serviceRegistry is null.</exception>
     public virtual IServiceProvider CreateServiceProvider(ServiceRegistry serviceRegistry)
     {
-        if (serviceRegistry == null)
-        {
-            throw new ArgumentNullException(nameof(serviceRegistry));
-        }
+        ArgumentNullException.ThrowIfNull(serviceRegistry);
 
         if (services == null)
         {
