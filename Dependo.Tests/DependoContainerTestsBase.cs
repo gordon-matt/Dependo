@@ -9,6 +9,12 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
     // Test interfaces and classes
     public interface ITestService { }
 
+    // Add generic test interfaces and classes
+    public interface IGenericService<T> { }
+    public class GenericService<T> : IGenericService<T> { }
+    public class StringGenericService : IGenericService<string> { }
+    public class IntGenericService : IGenericService<int> { }
+
     protected abstract TContainerBuilder ContainerBuilder { get; }
 
     [Fact]
@@ -317,6 +323,73 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
         // Assert
         Assert.False(resolved);
         Assert.Null(service);
+    }
+
+    [Fact]
+    public virtual void RegisterGeneric_WithOpenGenericTypes_RegistersService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterGeneric(typeof(IGenericService<>), typeof(GenericService<>), ServiceLifetime.Singleton));
+
+        // Act
+        var stringService = dependoContainer.Resolve<IGenericService<string>>();
+        var intService = dependoContainer.Resolve<IGenericService<int>>();
+
+        // Assert
+        Assert.NotNull(stringService);
+        Assert.NotNull(intService);
+        Assert.IsType<GenericService<string>>(stringService);
+        Assert.IsType<GenericService<int>>(intService);
+    }
+
+    [Fact]
+    public virtual void RegisterGeneric_WithClosedGenericTypes_RegistersService()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+        {
+            ContainerBuilder.RegisterGeneric(typeof(IGenericService<>), typeof(GenericService<>), ServiceLifetime.Singleton);
+            ContainerBuilder.Register<IGenericService<string>, StringGenericService>(ServiceLifetime.Singleton);
+        });
+
+        // Act
+        var stringService = dependoContainer.Resolve<IGenericService<string>>();
+        var intService = dependoContainer.Resolve<IGenericService<int>>();
+
+        // Assert
+        Assert.NotNull(stringService);
+        Assert.NotNull(intService);
+        Assert.IsType<StringGenericService>(stringService);
+        Assert.IsType<GenericService<int>>(intService);
+    }
+
+    [Fact]
+    public virtual void RegisterGeneric_WithDifferentLifetimes_RespectsLifetime()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() =>
+            ContainerBuilder.RegisterGeneric(typeof(IGenericService<>), typeof(GenericService<>), ServiceLifetime.Transient));
+
+        // Act
+        var stringService1 = dependoContainer.Resolve<IGenericService<string>>();
+        var stringService2 = dependoContainer.Resolve<IGenericService<string>>();
+
+        // Assert
+        Assert.NotNull(stringService1);
+        Assert.NotNull(stringService2);
+        Assert.NotSame(stringService1, stringService2);
+    }
+
+    [Fact]
+    public virtual void RegisterGeneric_WithInvalidTypes_ThrowsException()
+    {
+        // Arrange
+        using var dependoContainer = ConfigureDependoContainer(() => { });
+
+        // Act & Assert
+        Assert.ThrowsAny<Exception>(() =>
+            ContainerBuilder.RegisterGeneric(typeof(string), typeof(int), ServiceLifetime.Singleton));
     }
 
     protected abstract TContainer ConfigureDependoContainer(Action registerServices);
