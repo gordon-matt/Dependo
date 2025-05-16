@@ -31,7 +31,11 @@ public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<ICont
     {
         _services = services;
 
-        var container = new Container().WithDependencyInjectionAdapter(services).Container;
+        var container =
+            new Container(rules => DryIocAdapter
+                .WithMicrosoftDependencyInjectionRules(rules)
+                .WithFuncAndLazyWithoutRegistration())
+            .WithDependencyInjectionAdapter(services).Container;
         _configurationAction(container);
         return container;
     }
