@@ -73,6 +73,10 @@ public class DryIocContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterNamed(Type serviceType, Type implementationType, string name, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime), serviceKey: name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register(serviceType, implementationType, lifetime);
+
         return this;
     }
 
@@ -82,6 +86,10 @@ public class DryIocContainerBuilder : IContainerBuilder
         where TImplementation : class, TService
     {
         NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime), serviceKey: name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register<TService, TImplementation>(lifetime);
+
         return this;
     }
 
@@ -90,6 +98,10 @@ public class DryIocContainerBuilder : IContainerBuilder
         where TImplementation : class
     {
         NativeContainer.Register<TImplementation>(GetReuse(lifetime), serviceKey: name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterSelf<TImplementation>(lifetime);
+
         return this;
     }
 
@@ -98,6 +110,10 @@ public class DryIocContainerBuilder : IContainerBuilder
         where TService : class
     {
         NativeContainer.RegisterInstance(instance, serviceKey: name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(instance);
+
         return this;
     }
 
@@ -105,6 +121,10 @@ public class DryIocContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterInstanceNamed(Type serviceType, object instance, string name)
     {
         NativeContainer.RegisterInstance(serviceType, instance, serviceKey: name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(serviceType, instance);
+
         return this;
     }
 
@@ -112,6 +132,10 @@ public class DryIocContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterKeyed(Type serviceType, Type implementationType, object key, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         NativeContainer.Register(serviceType, implementationType, GetReuse(lifetime), serviceKey: key);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register(serviceType, implementationType, lifetime);
+
         return this;
     }
 
@@ -121,6 +145,10 @@ public class DryIocContainerBuilder : IContainerBuilder
         where TImplementation : class, TService
     {
         NativeContainer.Register<TService, TImplementation>(GetReuse(lifetime), serviceKey: key);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register<TService, TImplementation>(lifetime);
+
         return this;
     }
 
@@ -129,6 +157,10 @@ public class DryIocContainerBuilder : IContainerBuilder
         where TImplementation : class
     {
         NativeContainer.Register<TImplementation>(GetReuse(lifetime), serviceKey: key);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterSelf<TImplementation>(lifetime);
+
         return this;
     }
 
@@ -137,6 +169,10 @@ public class DryIocContainerBuilder : IContainerBuilder
         where TService : class
     {
         NativeContainer.RegisterInstance(instance, serviceKey: key);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(instance);
+
         return this;
     }
 
@@ -144,6 +180,10 @@ public class DryIocContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterInstanceKeyed(Type serviceType, object instance, object key)
     {
         NativeContainer.RegisterInstance(serviceType, instance, serviceKey: key);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(serviceType, instance);
+
         return this;
     }
 

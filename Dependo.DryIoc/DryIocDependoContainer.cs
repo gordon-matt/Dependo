@@ -2,6 +2,7 @@ using System.Xml.Linq;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.DryIoc;
 
@@ -12,7 +13,7 @@ public class DryIocDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
-    private IContainer? _container;
+    protected IContainer? _container;
     private bool _disposed;
 
     #endregion Private Members
@@ -22,7 +23,7 @@ public class DryIocDependoContainer : BaseDependoContainer
     /// <summary>
     /// Gets or sets service provider
     /// </summary>
-    public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
+    public virtual IServiceProvider ServiceProvider { get; protected set; } = default!;
 
     #endregion Properties
 
@@ -57,6 +58,8 @@ public class DryIocDependoContainer : BaseDependoContainer
             throw new InvalidOperationException("Container is not initialized");
         }
 
+        //return ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+
         using var scope = _container.OpenScope();
         return scope.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
     }
@@ -83,6 +86,8 @@ public class DryIocDependoContainer : BaseDependoContainer
             throw new InvalidOperationException("Container is not initialized");
         }
 
+        //return ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+
         using var scope = _container.OpenScope();
         return scope.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
     }
@@ -94,6 +99,9 @@ public class DryIocDependoContainer : BaseDependoContainer
         {
             throw new InvalidOperationException("Container is not initialized");
         }
+
+        //return ServiceProvider.GetKeyedService<T>(key)
+        //    ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name} with key {key}");
 
         using var scope = _container.OpenScope();
         return scope.Resolve<T>(serviceKey: key);
@@ -125,6 +133,9 @@ public class DryIocDependoContainer : BaseDependoContainer
             throw new InvalidOperationException("Container is not initialized");
         }
 
+        //return ServiceProvider.GetKeyedService<T>(name)
+        //    ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name} with name {name}");
+
         using var scope = _container.OpenScope();
         return scope.Resolve<T>(serviceKey: name);
     }
@@ -137,8 +148,11 @@ public class DryIocDependoContainer : BaseDependoContainer
             throw new InvalidOperationException("Container is not initialized");
         }
 
+        //return ServiceProvider.GetServices<T>()
+        //    ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+
         using var scope = _container.OpenScope();
-        return scope.ResolveMany<T>();
+        return scope.ResolveMany<T>().ToList();
     }
 
     /// <inheritdoc />
@@ -146,17 +160,23 @@ public class DryIocDependoContainer : BaseDependoContainer
         throw new NotSupportedException("DryIOC does not support multiple registrations of the same type and name. When registering, an exception is thrown.");
 
     /// <inheritdoc />
-    public override bool TryResolve<T>(out T instance) where T : class
+    public override bool TryResolve<T>(out T? instance) where T : class
     {
-        instance = _container!.Resolve<T>(IfUnresolved.ReturnDefault)!;
-        return instance != default;
+        instance = ServiceProvider.GetService<T>();
+        return instance != null;
+
+        //instance = _container!.Resolve<T>(IfUnresolved.ReturnDefault)!;
+        //return instance != default;
     }
 
     /// <inheritdoc />
-    public override bool TryResolve(Type serviceType, out object instance)
+    public override bool TryResolve(Type serviceType, out object? instance)
     {
-        instance = _container!.Resolve(serviceType, IfUnresolved.ReturnDefault);
-        return instance != default;
+        instance = ServiceProvider.GetService(serviceType);
+        return instance != null;
+
+        //instance = _container!.Resolve(serviceType, IfUnresolved.ReturnDefault);
+        //return instance != default;
     }
 
     #endregion IDependoContainer Members
