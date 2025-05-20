@@ -48,10 +48,7 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
     /// <exception cref="ArgumentNullException">Thrown when container is null.</exception>
     public virtual IServiceProvider CreateServiceProvider(ServiceContainer container)
     {
-        if (container == null)
-        {
-            throw new ArgumentNullException(nameof(container));
-        }
+        ArgumentNullException.ThrowIfNull(container);
 
         if (services == null)
         {
