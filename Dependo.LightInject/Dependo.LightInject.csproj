@@ -12,6 +12,7 @@
     <PackageReference Include="Extenso.Core" Version="9.2.0" />
     <PackageReference Include="LightInject" Version="7.0.1" />
     <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="4.0.0" />
+    <PackageReference Include="LightInject.Microsoft.Hosting" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
   </ItemGroup>
 
