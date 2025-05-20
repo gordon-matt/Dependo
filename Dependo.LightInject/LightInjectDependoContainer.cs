@@ -12,7 +12,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
-    private IServiceContainer? _container;
+    protected IServiceContainer? _container;
     private bool _disposed;
 
     #endregion Private Members
@@ -22,7 +22,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
     /// <summary>
     /// Gets or sets service provider
     /// </summary>
-    public virtual IServiceProvider ServiceProvider { get; private set; } = default!;
+    public virtual IServiceProvider ServiceProvider { get; protected set; } = default!;
 
     #endregion Properties
 

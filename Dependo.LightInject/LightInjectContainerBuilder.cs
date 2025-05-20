@@ -112,6 +112,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         {
             NativeContainer.Register(serviceType, implementationType, name);
         }
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register(serviceType, implementationType, lifetime);
+
         return this;
     }
 
@@ -129,6 +133,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         {
             NativeContainer.Register<TService, TImplementation>(name);
         }
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register<TService, TImplementation>(lifetime);
+
         return this;
     }
 
@@ -145,6 +153,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         {
             NativeContainer.Register<TImplementation, TImplementation>(name);
         }
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterSelf<TImplementation>(lifetime);
+
         return this;
     }
 
@@ -153,6 +165,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         where TService : class
     {
         NativeContainer.RegisterInstance(instance, name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(instance);
+
         return this;
     }
 
@@ -160,6 +176,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterInstanceNamed(Type serviceType, object instance, string name)
     {
         NativeContainer.RegisterInstance(serviceType, instance, name);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(serviceType, instance);
+
         return this;
     }
 
@@ -175,6 +195,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         {
             NativeContainer.Register(serviceType, implementationType, DependoHelper.StringifyKey(key)!);
         }
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register(serviceType, implementationType, lifetime);
+
         return this;
     }
 
@@ -192,6 +216,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         {
             NativeContainer.Register<TService, TImplementation>(DependoHelper.StringifyKey(key)!);
         }
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        Register<TService, TImplementation>(lifetime);
+
         return this;
     }
 
@@ -208,6 +236,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         {
             NativeContainer.Register<TImplementation, TImplementation>(DependoHelper.StringifyKey(key));
         }
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterSelf<TImplementation>(lifetime);
+
         return this;
     }
 
@@ -216,6 +248,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
         where TService : class
     {
         NativeContainer.RegisterInstance(instance, DependoHelper.StringifyKey(key)!);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(instance);
+
         return this;
     }
 
@@ -223,6 +259,10 @@ public class LightInjectContainerBuilder : IContainerBuilder
     public IContainerBuilder RegisterInstanceKeyed(Type serviceType, object instance, object key)
     {
         NativeContainer.RegisterInstance(serviceType, instance, DependoHelper.StringifyKey(key)!);
+
+        // Additionally, register the service without a name for compatibility when switching between service providers
+        RegisterInstance(serviceType, instance);
+
         return this;
     }
 
