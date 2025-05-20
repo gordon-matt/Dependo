@@ -1,8 +1,8 @@
-using System.ComponentModel;
-using System.Reflection;
 using LightInject;
+using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Dependo.LightInject;
 
@@ -32,30 +32,12 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
     {
         this.services = services;
 
-        var serviceContainer = new ServiceContainer();
+        var serviceContainer = new ServiceContainer(
+            ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
         using var rootScope = serviceContainer.BeginScope();
-        InvokeRegisterServices(serviceContainer, rootScope, services);
+        serviceContainer.RegisterFrom(new LightInjectCompositionRoot(services));
         configurationAction(serviceContainer);
         return serviceContainer;
-    }
-
-    // TODO: This is only partally working. There are still some issues using it with ASP.NET. Example exception:
-    // "ApplicationServices must not be null. This is normally set automatically via IConfigureOptions"
-    // Awaiting proper solution: https://github.com/seesharper/LightInject.Microsoft.DependencyInjection/issues/214
-    public static void InvokeRegisterServices(object container, object rootScope, IServiceCollection serviceCollection)
-    {
-        // Get the type containing the private method
-        var type = typeof(global::LightInject.Microsoft.DependencyInjection.DependencyInjectionContainerExtensions);
-
-        // Get the private method using reflection
-        var method = type.GetMethod("RegisterServices", BindingFlags.NonPublic | BindingFlags.Static);
-        if (method == null)
-        {
-            throw new InvalidOperationException("The method 'RegisterServices' could not be found.");
-        }
-
-        // Invoke the private method
-        method.Invoke(null, [container, rootScope, serviceCollection]);
     }
 
     /// <summary>
