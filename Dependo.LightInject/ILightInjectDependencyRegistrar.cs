@@ -19,4 +19,4 @@ public interface ILightInjectDependencyRegistrar : IDependencyRegistrarAdapter
     /// <param name="container">Service container</param>
     /// <param name="typeFinder">Type finder to help registration</param>
     void Register(IServiceContainer container, ITypeFinder typeFinder, IConfiguration configuration);
-} 
+}

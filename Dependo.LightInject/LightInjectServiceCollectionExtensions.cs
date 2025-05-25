@@ -12,7 +12,7 @@
 //    /// </summary>
 //    /// <param name="services">Service collection</param>
 //    /// <returns>Service collection</returns>
-//    public static IServiceCollection AddDependoLightInject(this IServiceCollection services) => 
+//    public static IServiceCollection AddDependoLightInject(this IServiceCollection services) =>
 //        services.AddSingleton<IDependoContainer, LightInjectDependoContainer>();
 
 //    /// <summary>
@@ -23,7 +23,7 @@
 //    /// <returns>Service collection</returns>
 //    public static IServiceCollection AddDependoLightInject(
 //        this IServiceCollection services,
-//        Action<IServiceContainer>? configureContainer = null) => 
+//        Action<IServiceContainer>? configureContainer = null) =>
 //        services.AddDependoLightInject()
 //            .AddSingleton<IServiceProviderFactory<IServiceContainer>>(
 //                new DependableLightInjectServiceProviderFactory(configureContainer));

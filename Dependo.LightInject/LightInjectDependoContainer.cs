@@ -49,25 +49,23 @@ public class LightInjectDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override bool IsRegistered(Type serviceType)
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.BeginScope();
-        return scope.GetInstance(serviceType) != null;
+        return ServiceProvider.GetService(serviceType) != null;
     }
 
     /// <inheritdoc />
     public override T Resolve<T>() where T : class
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.BeginScope();
-        return scope.GetInstance<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+        return ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
     }
 
     /// <inheritdoc />
@@ -77,13 +75,12 @@ public class LightInjectDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override object Resolve(Type type)
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.BeginScope();
-        return scope.GetInstance(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+        return ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
     }
 
     /// <inheritdoc />
@@ -101,45 +98,34 @@ public class LightInjectDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override T ResolveNamed<T>(string name) where T : class
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.BeginScope();
-        return scope.GetInstance<T>(name);
+        return ServiceProvider.GetKeyedService<T>(name);
     }
 
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAll<T>()
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.BeginScope();
-        return scope.GetAllInstances<T>();
+        return ServiceProvider.GetServices<T>();
     }
 
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
         throw new NotSupportedException(
             "LightInject does not support multiple registrations of the same type and name. When registering, they get overriden. Call ResolveNamed<T> instead");
-    //{
-    //    if (_container == null)
-    //    {
-    //        throw new InvalidOperationException("Container is not initialized");
-    //    }
-
-    //    using var scope = _container.BeginScope();
-    //    return [scope.GetInstance<T>(name)];
-    //}
 
     /// <inheritdoc />
     public override bool TryResolve<T>(out T? instance) where T : class
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             instance = default;
             return false;
@@ -147,8 +133,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
 
         try
         {
-            using var scope = _container.BeginScope();
-            instance = scope.GetInstance<T>();
+            instance = ServiceProvider.GetService<T>();
             return instance != null;
         }
         catch
@@ -161,7 +146,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
     /// <inheritdoc />
     public override bool TryResolve(Type serviceType, out object? instance)
     {
-        if (_container == null)
+        if (ServiceProvider == null)
         {
             instance = default;
             return false;
@@ -169,8 +154,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
 
         try
         {
-            using var scope = _container.BeginScope();
-            instance = scope.GetInstance(serviceType);
+            instance = ServiceProvider.GetService(serviceType);
             return instance != null;
         }
         catch

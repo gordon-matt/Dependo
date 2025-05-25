@@ -77,4 +77,18 @@ public class LightInjectDependoContainerTests : DependoContainerTestsBase<LightI
         //Assert.Contains(services, s => s.GetType() == typeof(TestService));
         Assert.Contains(services, s => s.GetType() == typeof(AnotherTestService));
     }
+
+    [Fact]
+    public override void ResolveKeyed_UnregisteredKeyedType_ThrowsException()
+    {
+        using var dependoContainer = ConfigureDependoContainer(() => { });
+        Assert.Null(dependoContainer.ResolveKeyed<ITestService>("test-service"));
+    }
+
+    [Fact]
+    public override void ResolveNamed_UnregisteredNamedType_ThrowsException()
+    {
+        using var dependoContainer = ConfigureDependoContainer(() => { });
+        Assert.Null(dependoContainer.ResolveNamed<ITestService>("test-service"));
+    }
 }
