@@ -32,8 +32,14 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
     {
         this.services = services;
 
-        var serviceContainer = new ServiceContainer(
-            ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+        var containerOptions = ContainerOptions.Default
+            .Clone()
+            .WithMicrosoftSettings()
+            .WithAspNetCoreSettings();
+
+        containerOptions.DefaultServiceSelector = services => services.Last();
+
+        var serviceContainer = new ServiceContainer(containerOptions);
         using var rootScope = serviceContainer.BeginScope();
         serviceContainer.RegisterFrom(new LightInjectCompositionRoot(services));
         configurationAction(serviceContainer);

@@ -54,4 +54,4 @@ public class LightInjectDependencyRegistrarAdapter : IDependencyRegistrarAdapter
         // Create and return the adapter
         return new LightInjectDependencyRegistrarAdapter(lightInjectRegistrar);
     }
-} 
+}
