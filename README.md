@@ -19,7 +19,7 @@ Check the demo project for a clearer idea on how to use Dependo.
 
 > Dependo.Lamar: https://www.nuget.org/packages/Dependo.Lamar/
 
-> Dependo.LightInject: Coming soon...
+> Dependo.LightInject: https://www.nuget.org/packages/Dependo.LightInject/
 
 ## Feature Support
 
