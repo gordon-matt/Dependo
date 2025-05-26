@@ -1,8 +1,6 @@
 <img src="https://github.com/gordon-matt/Dependo/blob/master/_Misc/Logo.png" alt="Logo" width="250" />
 
-# Dependo
-
-## Info
+## Intro
 
 Dependo is a library that let's you resolve dependencies from anywhere via a singleton call to `DependoResolver.Instance`. This is mostly useful for resolving dependencies in static classes, including extensions methods.
 
@@ -11,17 +9,15 @@ Additionally, there is an `IDependencyRegistrar` interface to let you register d
 Check the demo project for a clearer idea on how to use Dependo. Or for a more advanced example, see it being used in [MantleCMS](https://github.com/gordon-matt/MantleCMS)
 
 ## NuGet Packages
-> Dependo: https://www.nuget.org/packages/Dependo/
 
-> Dependo.Autofac: https://www.nuget.org/packages/Dependo.Autofac/
-
-> Dependo.DotNetDefault: https://www.nuget.org/packages/Dependo.DotNetDefault/
-
-> Dependo.DryIoc: https://www.nuget.org/packages/Dependo.DryIoc/
-
-> Dependo.Lamar: https://www.nuget.org/packages/Dependo.Lamar/
-
-> Dependo.LightInject: https://www.nuget.org/packages/Dependo.LightInject/
+| Package                | Link                                                  |
+|------------------------|-------------------------------------------------------|
+| Dependo                | https://www.nuget.org/packages/Dependo/               |
+| Dependo.Autofac        | https://www.nuget.org/packages/Dependo.Autofac/       |
+| Dependo.DotNetDefault  | https://www.nuget.org/packages/Dependo.DotNetDefault/ |
+| Dependo.DryIoc         | https://www.nuget.org/packages/Dependo.DryIoc/        |
+| Dependo.Lamar          | https://www.nuget.org/packages/Dependo.Lamar/         |
+| Dependo.LightInject    | https://www.nuget.org/packages/Dependo.LightInject/   |
 
 ## Feature Support
 
