@@ -10,14 +10,14 @@ Check the demo project for a clearer idea on how to use Dependo. Or for a more a
 
 ## NuGet Packages
 
-| Package                | Link                                                  |
-|------------------------|-------------------------------------------------------|
-| Dependo                | https://www.nuget.org/packages/Dependo/               |
-| Dependo.Autofac        | https://www.nuget.org/packages/Dependo.Autofac/       |
-| Dependo.DotNetDefault  | https://www.nuget.org/packages/Dependo.DotNetDefault/ |
-| Dependo.DryIoc         | https://www.nuget.org/packages/Dependo.DryIoc/        |
-| Dependo.Lamar          | https://www.nuget.org/packages/Dependo.Lamar/         |
-| Dependo.LightInject    | https://www.nuget.org/packages/Dependo.LightInject/   |
+| Package                | Link                                                                                                                                                              |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Dependo                | [![NuGet](https://img.shields.io/nuget/v/Dependo?style=flat-square&logo=nuget&label=Version)](https://www.nuget.org/packages/Dependo)                             |
+| Dependo.Autofac        | [![NuGet](https://img.shields.io/nuget/v/Dependo.Autofac?style=flat-square&logo=nuget&label=Version)](https://www.nuget.org/packages/Dependo.Autofac)             |
+| Dependo.DotNetDefault  | [![NuGet](https://img.shields.io/nuget/v/Dependo.DotNetDefault?style=flat-square&logo=nuget&label=Version)](https://www.nuget.org/packages/Dependo.DotNetDefault) |
+| Dependo.DryIoc         | [![NuGet](https://img.shields.io/nuget/v/Dependo.DryIoc?style=flat-square&logo=nuget&label=Version)](https://www.nuget.org/packages/Dependo.DryIoc)               |
+| Dependo.Lamar          | [![NuGet](https://img.shields.io/nuget/v/Dependo.Lamar?style=flat-square&logo=nuget&label=Version)](https://www.nuget.org/packages/Dependo.Lamar)                 |
+| Dependo.LightInject    | [![NuGet](https://img.shields.io/nuget/v/Dependo.LightInject?style=flat-square&logo=nuget&label=Version)](https://www.nuget.org/packages/Dependo.LightInject)     |
 
 ## Feature Support
 
