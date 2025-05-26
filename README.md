@@ -1,3 +1,5 @@
+<img src="https://github.com/gordon-matt/Dependo/blob/master/_Misc/Logo.png" alt="Logo" width="250" />
+
 # Dependo
 
 ## Info
@@ -6,7 +8,7 @@ Dependo is a library that let's you resolve dependencies from anywhere via a sin
 
 Additionally, there is an `IDependencyRegistrar` interface to let you register dependencies from anywhere, such as class libraries. If you need to take advantage of implementation-specific registration features, you can make use of the more specialized dependency registrar, such as `IAutofacDependencyRegistrar`, `IDryIocDependencyRegistrar`, etc.
 
-Check the demo project for a clearer idea on how to use Dependo.
+Check the demo project for a clearer idea on how to use Dependo. Or for a more advanced example, see it being used in [MantleCMS](https://github.com/gordon-matt/MantleCMS)
 
 ## NuGet Packages
 > Dependo: https://www.nuget.org/packages/Dependo/
