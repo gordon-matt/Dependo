@@ -196,8 +196,8 @@ public class DryIocContainerBuilder : IContainerBuilder
         lifetime switch
         {
             ServiceLifetime.Singleton => Reuse.Singleton,
-            ServiceLifetime.Scoped => Reuse.Scoped,
+            ServiceLifetime.Scoped => Reuse.ScopedOrSingleton,
             ServiceLifetime.Transient => Reuse.Transient,
-            _ => Reuse.Scoped
+            _ => Reuse.ScopedOrSingleton
         };
 }

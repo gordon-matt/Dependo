@@ -1,4 +1,3 @@
-using System.Xml.Linq;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -60,8 +59,7 @@ public class DryIocDependoContainer : BaseDependoContainer
 
         //return ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
-        using var scope = _container.OpenScope();
-        return scope.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
+        return _container.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
     }
 
     /// <inheritdoc />
@@ -72,10 +70,9 @@ public class DryIocDependoContainer : BaseDependoContainer
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.OpenScope();
         // Convert dictionary to array of parameters
         object[] args = ctorArgs.Values.ToArray();
-        return scope.Resolve<T>(args);
+        return _container.Resolve<T>(args);
     }
 
     /// <inheritdoc />
@@ -88,8 +85,7 @@ public class DryIocDependoContainer : BaseDependoContainer
 
         //return ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
 
-        using var scope = _container.OpenScope();
-        return scope.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
+        return _container.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
     }
 
     /// <inheritdoc />
@@ -103,8 +99,7 @@ public class DryIocDependoContainer : BaseDependoContainer
         //return ServiceProvider.GetKeyedService<T>(key)
         //    ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name} with key {key}");
 
-        using var scope = _container.OpenScope();
-        return scope.Resolve<T>(serviceKey: key);
+        return _container.Resolve<T>(serviceKey: key);
     }
 
     /// <inheritdoc />
@@ -115,10 +110,9 @@ public class DryIocDependoContainer : BaseDependoContainer
             throw new InvalidOperationException("Container is not initialized");
         }
 
-        using var scope = _container.OpenScope();
         // Convert dictionary to array of parameters
         object[] args = ctorArgs.Values.ToArray();
-        return scope.Resolve<T>(args, serviceKey: key);
+        return _container.Resolve<T>(args, serviceKey: key);
     }
 
     /// <inheritdoc />
@@ -136,8 +130,7 @@ public class DryIocDependoContainer : BaseDependoContainer
         //return ServiceProvider.GetKeyedService<T>(name)
         //    ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name} with name {name}");
 
-        using var scope = _container.OpenScope();
-        return scope.Resolve<T>(serviceKey: name);
+        return _container.Resolve<T>(serviceKey: name);
     }
 
     /// <inheritdoc />
@@ -151,8 +144,7 @@ public class DryIocDependoContainer : BaseDependoContainer
         //return ServiceProvider.GetServices<T>()
         //    ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
-        using var scope = _container.OpenScope();
-        return scope.ResolveMany<T>().ToList();
+        return _container.ResolveMany<T>().ToList();
     }
 
     /// <inheritdoc />
