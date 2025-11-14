@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dependo.Autofac\Dependo.Autofac.csproj" />
-    <ProjectReference Include="..\Dependo.DotNetDefault\Dependo.DotNetDefault.csproj" />
-    <ProjectReference Include="..\Dependo.DryIoc\Dependo.DryIoc.csproj" />
-    <ProjectReference Include="..\Dependo.Lamar\Dependo.Lamar.csproj" />
-    <ProjectReference Include="..\Dependo.LightInject\Dependo.LightInject.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Dependo.Autofac\Dependo.Autofac.csproj" />
+		<ProjectReference Include="..\Dependo.DotNetDefault\Dependo.DotNetDefault.csproj" />
+		<ProjectReference Include="..\Dependo.DryIoc\Dependo.DryIoc.csproj" />
+		<ProjectReference Include="..\Dependo.Lamar\Dependo.Lamar.csproj" />
+		<ProjectReference Include="..\Dependo.LightInject\Dependo.LightInject.csproj" />
+	</ItemGroup>
 </Project>
