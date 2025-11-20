@@ -28,16 +28,16 @@ builder.Host
     //{
     //    // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
     //});
-    //.UseServiceProviderFactory(new DependoAutofacServiceProviderFactory())
-    //.ConfigureContainer<ContainerBuilder>(container =>
-    //{
-    //    // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
-    //});
-    .UseServiceProviderFactory(new DependoDryIocServiceProviderFactory())
-    .ConfigureContainer<DryIoc.Container>(container =>
-     {
-         // Add your DryIoc-specific registrations here or use an IDryIocDependencyRegistrar
-     });
+    .UseServiceProviderFactory(new DependoAutofacServiceProviderFactory())
+    .ConfigureContainer<ContainerBuilder>(container =>
+    {
+        // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
+    });
+    //.UseServiceProviderFactory(new DependoDryIocServiceProviderFactory())
+    //.ConfigureContainer<DryIoc.Container>(container =>
+    // {
+    //     // Add your DryIoc-specific registrations here or use an IDryIocDependencyRegistrar
+    // });
     //.UseServiceProviderFactory(new DependoLamarServiceProviderFactory())
     //.ConfigureContainer<ServiceRegistry>(container =>
     // {

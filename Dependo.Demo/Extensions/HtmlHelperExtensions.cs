@@ -6,9 +6,12 @@ namespace Dependo.Demo.Extensions;
 
 public static class HtmlHelperExtensions
 {
-    public static IHtmlContent HelloWorld(this IHtmlHelper htmlHelper)
+    extension(IHtmlHelper html)
     {
-        var service = DependoResolver.Instance.Resolve<IHelloWorldService>();
-        return new HtmlString(service.HelloWorld());
+        public IHtmlContent HelloWorld()
+        {
+            var service = DependoResolver.Instance.Resolve<IHelloWorldService>();
+            return new HtmlString(service.HelloWorld());
+        }
     }
 }

@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Demos/">
+    <Project Path="Dependo.Demo/Dependo.Demo.csproj" />
+  </Folder>
+  <Project Path="Dependo.Autofac/Dependo.Autofac.csproj" />
+  <Project Path="Dependo.DotNetDefault/Dependo.DotNetDefault.csproj" />
+  <Project Path="Dependo.DryIoc/Dependo.DryIoc.csproj" />
+  <Project Path="Dependo.Lamar/Dependo.Lamar.csproj" />
+  <Project Path="Dependo.LightInject/Dependo.LightInject.csproj" />
+  <Project Path="Dependo.Tests/Dependo.Tests.csproj" />
+  <Project Path="Dependo/Dependo.csproj" />
+</Solution>
