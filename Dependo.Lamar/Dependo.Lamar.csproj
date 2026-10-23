@@ -3,14 +3,14 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>1.2.0</Version>
+		<Version>1.2.2</Version>
 		<Description>Lamar implementation for Dependo</Description>
 	</PropertyGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Lamar" Version="15.0.1" />
+		<PackageReference Include="Lamar" Version="16.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Dependo\Dependo.csproj" />
