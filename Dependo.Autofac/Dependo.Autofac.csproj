@@ -3,8 +3,9 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>1.2.2</Version>
+		<Version>1.2.3</Version>
 		<Description>Autofac implementation for Dependo</Description>
+		<PackageTags>dependency-injection;ioc;autofac;dependency-resolver;registrar;aspnetcore</PackageTags>
 	</PropertyGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

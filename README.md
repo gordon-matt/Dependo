@@ -1,4 +1,4 @@
-<img src="https://github.com/gordon-matt/Dependo/blob/master/_Misc/Logo.png" alt="Logo" width="250" />
+<img src="https://github.com/gordon-matt/Dependo/raw/master/_Misc/Logo.png" alt="Logo" width="250" />
 
 ## Intro
 
