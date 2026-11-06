@@ -1,7 +1,15 @@
 ﻿namespace Dependo;
 
+/// <summary>
+/// Provides dependo helper.
+/// </summary>
 public static class DependoHelper
 {
+    /// <summary>
+    /// Stringifies the key.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <returns>The key.</returns>
     public static string StringifyKey(object key) => key switch
     {
         string s => s,

@@ -12,6 +12,9 @@ public class LightInjectDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
+    /// <summary>
+    /// The container.
+    /// </summary>
     protected IServiceContainer? _container;
     private bool _disposed;
 

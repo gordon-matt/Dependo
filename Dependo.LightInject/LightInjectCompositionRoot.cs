@@ -3,15 +3,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.LightInject;
 
+/// <summary>
+/// Represents the light inject composition root.
+/// </summary>
 public class LightInjectCompositionRoot : ICompositionRoot
 {
     private readonly IServiceCollection _services;
 
+    /// <summary>
+    /// Initializes a new instance of the LightInjectCompositionRoot class.
+    /// </summary>
+    /// <param name="services">The services.</param>
     public LightInjectCompositionRoot(IServiceCollection services)
     {
         _services = services;
     }
 
+    /// <summary>
+    /// Performs the compose operation.
+    /// </summary>
+    /// <param name="serviceRegistry">The service registry.</param>
     public void Compose(IServiceRegistry serviceRegistry)
     {
         // Register all services from the IServiceCollection

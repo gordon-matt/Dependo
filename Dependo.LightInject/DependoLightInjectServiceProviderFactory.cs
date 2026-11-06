@@ -12,6 +12,9 @@ namespace Dependo.LightInject;
 public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<ServiceContainer>
 {
     private readonly Action<ServiceContainer> configurationAction;
+    /// <summary>
+    /// The services.
+    /// </summary>
     protected IServiceCollection? services;
 
     /// <summary>

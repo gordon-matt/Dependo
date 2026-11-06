@@ -9,6 +9,9 @@ namespace Dependo.DotNetDefault;
 public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
 {
     private readonly Action<IServiceCollection> configurationAction;
+    /// <summary>
+    /// The services.
+    /// </summary>
     protected IServiceCollection? services;
 
     /// <summary>

@@ -11,6 +11,9 @@ namespace Dependo.DryIoc;
 public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<IContainer>
 {
     private readonly Action<IContainer> _configurationAction;
+    /// <summary>
+    /// The services.
+    /// </summary>
     protected IServiceCollection? _services;
 
     /// <summary>

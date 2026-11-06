@@ -12,6 +12,9 @@ public class LamarDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
+    /// <summary>
+    /// The container.
+    /// </summary>
     protected Container? _container;
     private bool _disposed;
 

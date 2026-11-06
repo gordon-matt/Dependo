@@ -12,6 +12,9 @@ public class DryIocDependoContainer : BaseDependoContainer
 {
     #region Private Members
 
+    /// <summary>
+    /// The container.
+    /// </summary>
     protected IContainer? _container;
     private bool _disposed;
 

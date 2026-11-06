@@ -11,6 +11,9 @@ namespace Dependo.Autofac;
 public class DependoAutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
 {
     private readonly Action<ContainerBuilder> configurationAction;
+    /// <summary>
+    /// The services.
+    /// </summary>
     protected IServiceCollection? services;
 
     /// <summary>

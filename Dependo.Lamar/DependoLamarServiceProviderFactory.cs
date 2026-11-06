@@ -10,6 +10,9 @@ namespace Dependo.Lamar;
 public class DependoLamarServiceProviderFactory : IServiceProviderFactory<ServiceRegistry>
 {
     private readonly Action<ServiceRegistry> configurationAction;
+    /// <summary>
+    /// The services.
+    /// </summary>
     protected IServiceCollection? services;
 
     /// <summary>

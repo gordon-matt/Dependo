@@ -5,6 +5,11 @@
 /// </summary>
 public interface IDependoContainer : IDisposable
 {
+    /// <summary>
+    /// Determines whether this instance is registered.
+    /// </summary>
+    /// <param name="serviceType">The service type.</param>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     bool IsRegistered(Type serviceType);
 
     /// <summary>

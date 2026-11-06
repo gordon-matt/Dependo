@@ -1,5 +1,8 @@
 ﻿namespace Dependo;
 
+/// <summary>
+/// Represents the base dependo container.
+/// </summary>
 public abstract class BaseDependoContainer : IDependoContainer
 {
     /// <inheritdoc />
@@ -68,5 +71,8 @@ public abstract class BaseDependoContainer : IDependoContainer
     /// <inheritdoc />
     public abstract bool TryResolve(Type serviceType, out object? instance);
 
+    /// <summary>
+    /// Releases the resources used by this instance.
+    /// </summary>
     public abstract void Dispose();
 }
