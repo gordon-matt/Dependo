@@ -6,6 +6,30 @@ Dependo is a library that let's you resolve dependencies from anywhere via a sin
 
 Additionally, there is an `IDependencyRegistrar` interface to let you register dependencies from anywhere, such as class libraries. If you need to take advantage of implementation-specific registration features, you can make use of the more specialized dependency registrar, such as `IAutofacDependencyRegistrar`, `IDryIocDependencyRegistrar`, etc.
 
+## Compile-time discovery
+
+Finding those registrars used to reflect over every assembly already loaded in the process. Referencing a Dependo container package now generates that list while the project compiles.
+
+The application project (the one with an entry point) writes a module initializer that loads each participating assembly and seals `DependoCatalog`. Library projects that contain an `IDependencyRegistrar`, or a concrete type exported with `DependoExports`, write their own initializer. After `DependoCatalog` is sealed, `ITypeFinder` answers those queries from the catalog. Published container packages carry the generator. A project reference does not, so attach `Dependo.Generator` with `OutputItemType` set to `Analyzer`.
+
+`IDependencyRegistrar` and the container-specific registrar interfaces are always catalogued. For anything else a host discovers by scanning, mark the service once:
+
+```csharp
+[assembly: Dependo.DependoExports(typeof(IStartupTask), typeof(ITask))]
+```
+
+Put that attribute on an assembly that implementors reference, or on each assembly that contains implementations. The generator only sees a project that references Dependo directly, because source generators do not flow through transitive packages. Types discovered this way still need a public or internal parameterless constructor when the host activates them itself.
+
+Assemblies loaded after startup, such as plugins, are still reflected once, and only those assemblies. Framework assemblies that match the type finder's skip pattern are not. Hosts that load plugins themselves should turn off the extra pass that loads every DLL from the output folder:
+
+```csharp
+DependoCatalog.ProbeBinFolder = false;
+```
+
+Set that before the container is built. Leave the default when plugins are discovered by probing the bin folder.
+
+To force the mode, set `DependoCatalog` to `root`, `local`, or `off`. `off` keeps the reflection scan.
+
 Check the demo project for a clearer idea on how to use Dependo. Or for a more advanced example, see it being used in [MantleCMS](https://github.com/gordon-matt/MantleCMS)
 
 ## NuGet Packages

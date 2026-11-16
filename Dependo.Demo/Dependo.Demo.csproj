@@ -11,5 +11,6 @@
 		<ProjectReference Include="..\Dependo.DryIoc\Dependo.DryIoc.csproj" />
 		<ProjectReference Include="..\Dependo.Lamar\Dependo.Lamar.csproj" />
 		<ProjectReference Include="..\Dependo.LightInject\Dependo.LightInject.csproj" />
+		<ProjectReference Include="..\Dependo.Generator\Dependo.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" />
 	</ItemGroup>
 </Project>

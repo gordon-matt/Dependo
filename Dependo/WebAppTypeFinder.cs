@@ -22,14 +22,24 @@ public class WebAppTypeFinder : AppDomainTypeFinder
     /// <returns>Result</returns>
     public override IList<Assembly> GetAssemblies()
     {
-        if (EnsureBinFolderAssembliesLoaded && !binFolderAssembliesLoaded)
+        LoadBinFolderAssemblies();
+        return base.GetAssemblies();
+    }
+
+    /// <inheritdoc />
+    protected override void EnsureCatalogAssembliesLoaded() => LoadBinFolderAssemblies();
+
+    private void LoadBinFolderAssemblies()
+    {
+        // ProbeBinFolder stays on for hosts that discover plugins by loading every DLL.
+        // A host that loads plugins itself turns it off and avoids that walk at startup.
+        if (!DependoCatalog.ProbeBinFolder || !EnsureBinFolderAssembliesLoaded || binFolderAssembliesLoaded)
         {
-            binFolderAssembliesLoaded = true;
-            string binPath = GetBinDirectory();
-            LoadMatchingAssemblies(binPath);
+            return;
         }
 
-        return base.GetAssemblies();
+        binFolderAssembliesLoaded = true;
+        LoadMatchingAssemblies(GetBinDirectory());
     }
 
     /// <summary>

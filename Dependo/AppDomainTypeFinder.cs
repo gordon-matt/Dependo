@@ -41,8 +41,15 @@ public class AppDomainTypeFinder : ITypeFinder
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
     /// <returns>Result</returns>
     /// <returns></returns>
-    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true) =>
-        FindClassesOfType(assignTypeFrom, GetAssemblies(), onlyConcreteClasses);
+    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true)
+    {
+        if (TryGetCatalogExports(assignTypeFrom, onlyConcreteClasses, out var exported))
+        {
+            return exported;
+        }
+
+        return FindClassesOfType(assignTypeFrom, GetAssemblies(), onlyConcreteClasses, applyAssemblyFilter: true);
+    }
 
     /// <summary>
     /// Find classes of type
@@ -61,33 +68,57 @@ public class AppDomainTypeFinder : ITypeFinder
     /// <param name="assemblies">Assemblies</param>
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
     /// <returns>Result</returns>
-    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true)
+    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true) =>
+        FindClassesOfType(assignTypeFrom, assemblies, onlyConcreteClasses, applyAssemblyFilter: false);
+
+    /// <summary>
+    /// Loads assemblies that compile-time discovery cannot see, such as plugin DLLs in the bin folder.
+    /// The catalog path calls this before reading <see cref="DependoCatalog"/>.
+    /// </summary>
+    protected virtual void EnsureCatalogAssembliesLoaded()
+    {
+    }
+
+    private bool TryGetCatalogExports(Type assignTypeFrom, bool onlyConcreteClasses, out IReadOnlyList<Type> exported)
+    {
+        if (!DependoCatalog.IsSealed)
+        {
+            exported = [];
+            return false;
+        }
+
+        EnsureCatalogAssembliesLoaded();
+        return DependoCatalog.TryGetExports(
+            assignTypeFrom,
+            onlyConcreteClasses,
+            includeAssembly: assembly => IsAssemblySafeToLoad(assembly.FullName ?? string.Empty),
+            out exported);
+    }
+
+    private IEnumerable<Type> FindClassesOfType(
+        Type assignTypeFrom,
+        IEnumerable<Assembly> assemblies,
+        bool onlyConcreteClasses,
+        bool applyAssemblyFilter)
     {
         var result = new List<Type>();
         try
         {
             foreach (var assembly in assemblies)
             {
-                Type[]? types = null;
-                try
-                {
-                    types = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    // Get types that could be loaded
-                    types = ex.Types
-                        .Where(t => t != null)
-                        .Select(x => x!)
-                        .ToArray();
-                }
-
-                if (types == null)
+                if (assembly.IsDynamic)
                 {
                     continue;
                 }
 
-                foreach (var type in types)
+                // The skip pattern used to apply only while loading DLLs from disk. Assemblies already
+                // in the AppDomain, including the framework, were still reflected on every query.
+                if (applyAssemblyFilter && !IsAssemblySafeToLoad(assembly.FullName ?? string.Empty))
+                {
+                    continue;
+                }
+
+                foreach (var type in AssemblyTypeList.GetTypes(assembly))
                 {
                     if (type.IsInterface || type.IsAbstract)
                     {
@@ -115,6 +146,7 @@ public class AppDomainTypeFinder : ITypeFinder
 
             throw fail;
         }
+
         return result;
     }
 
@@ -203,6 +235,7 @@ public class AppDomainTypeFinder : ITypeFinder
 
                 return genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
             }
+
             return false;
         }
         catch

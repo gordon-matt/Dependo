@@ -8,5 +8,6 @@
   <Project Path="Dependo.Lamar/Dependo.Lamar.csproj" />
   <Project Path="Dependo.LightInject/Dependo.LightInject.csproj" />
   <Project Path="Dependo.Tests/Dependo.Tests.csproj" />
+  <Project Path="Dependo.Generator/Dependo.Generator.csproj" />
   <Project Path="Dependo/Dependo.csproj" />
 </Solution>

@@ -1,0 +1,6 @@
+<Project>
+	<!-- Lets a host set DependoCatalog to root, local, or off and have the generator see it. -->
+	<ItemGroup>
+		<CompilerVisibleProperty Include="DependoCatalog" />
+	</ItemGroup>
+</Project>
