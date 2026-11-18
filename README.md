@@ -28,6 +28,12 @@ DependoCatalog.ProbeBinFolder = false;
 
 Set that before the container is built. Leave the default when plugins are discovered by probing the bin folder.
 
+To skip more assemblies than the built-in list, add name prefixes before the container is built. A prefix matches the start of the assembly full name and is applied together with the type finder's skip pattern. The built-in prefixes, such as `System` and `Microsoft`, stay in place.
+
+```csharp
+DependoCatalog.SkipAssembliesStartingWith("AWSSDK", "Azure", "Google", "Grpc");
+```
+
 To force the mode, set `DependoCatalog` to `root`, `local`, or `off`. `off` keeps the reflection scan.
 
 Check the demo project for a clearer idea on how to use Dependo. Or for a more advanced example, see it being used in [MantleCMS](https://github.com/gordon-matt/MantleCMS)

@@ -102,6 +102,66 @@ public sealed class AppDomainTypeFinderFilterTests
 
         Assert.Empty(found);
     }
+
+    [Fact]
+    public void IsAssemblySafeToLoad_AdditionalPrefix_SkipsMatchingAssembly()
+    {
+        DependoCatalog.SkipAssembliesStartingWith("AWSSDK", "Azure");
+
+        var finder = new AppDomainTypeFinder();
+
+        Assert.False(finder.IsAssemblySafeToLoad("AWSSDK.S3, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null"));
+        Assert.False(finder.IsAssemblySafeToLoad("azure.core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"));
+        Assert.True(finder.IsAssemblySafeToLoad("Dependo.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"));
+        Assert.False(finder.IsAssemblySafeToLoad("System.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"));
+    }
+
+    [Fact]
+    public void FindClassesOfType_AdditionalPrefix_DoesNotReflectMatchingAssemblies()
+    {
+        DependoCatalog.SkipAssembliesStartingWith(typeof(ExcludedProbe).Assembly.GetName().Name!.ToLowerInvariant());
+
+        var found = new AppDomainTypeFinder().FindClassesOfType<ICatalogProbe>();
+
+        Assert.Empty(found);
+    }
+
+    [Fact]
+    public void TryGetExports_AdditionalPrefix_SkipsUncataloguedAssembly()
+    {
+        DependoCatalog.RegisterService(typeof(ICatalogProbe));
+        DependoCatalog.Seal();
+        DependoCatalog.SkipAssembliesStartingWith(typeof(ExcludedProbe).Assembly.GetName().Name!);
+
+        var found = new AppDomainTypeFinder().FindClassesOfType<ICatalogProbe>();
+
+        Assert.Empty(found);
+    }
+
+    [Fact]
+    public void SkipAssembliesStartingWith_IgnoresDuplicatePrefixes()
+    {
+        DependoCatalog.SkipAssembliesStartingWith("Azure", " azure ", "AZURE");
+
+        Assert.Equal(["Azure"], DependoCatalog.SkipAssemblyPrefixes);
+    }
+
+    [Fact]
+    public void SkipAssembliesStartingWith_RejectsEmptyPrefix()
+    {
+        Assert.Throws<ArgumentException>(() => DependoCatalog.SkipAssembliesStartingWith("Azure", " "));
+        Assert.Empty(DependoCatalog.SkipAssemblyPrefixes);
+    }
+
+    [Fact]
+    public void Reset_ClearsSkipAssemblyPrefixes()
+    {
+        DependoCatalog.SkipAssembliesStartingWith("Azure");
+
+        DependoCatalog.Reset();
+
+        Assert.Empty(DependoCatalog.SkipAssemblyPrefixes);
+    }
 }
 
 /// <summary>A service used only to prove the catalog does not scan past its exports.</summary>

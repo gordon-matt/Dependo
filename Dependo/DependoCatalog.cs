@@ -14,6 +14,7 @@ namespace Dependo;
 /// <para>
 /// Assemblies loaded later, such as plugins, are still inspected once. Only those assemblies are
 /// reflected, and framework assemblies that match the type finder's skip pattern are ignored.
+/// Call <see cref="SkipAssembliesStartingWith"/> before the container is built to skip more name prefixes.
 /// Set <see cref="ProbeBinFolder"/> to <see langword="false"/> when plugins are loaded by the host
 /// before the container is built, so startup does not also load every DLL in the output folder.
 /// </para>
@@ -25,6 +26,7 @@ public static class DependoCatalog
     private static readonly Dictionary<Type, List<Type>> exports = [];
     private static readonly HashSet<Assembly> knownAssemblies = [];
     private static readonly HashSet<Assembly> scannedAssemblies = [];
+    private static readonly List<string> skipAssemblyPrefixes = [];
     private static bool isSealed;
 
     /// <summary>
@@ -34,6 +36,20 @@ public static class DependoCatalog
     /// is built when every plugin assembly is already loaded.
     /// </summary>
     public static bool ProbeBinFolder { get; set; } = true;
+
+    /// <summary>
+    /// Gets the assembly-name prefixes added with <see cref="SkipAssembliesStartingWith"/>.
+    /// </summary>
+    public static IReadOnlyList<string> SkipAssemblyPrefixes
+    {
+        get
+        {
+            lock (gate)
+            {
+                return skipAssemblyPrefixes.ToArray();
+            }
+        }
+    }
 
     /// <summary>
     /// Gets a value indicating whether the application assembly has finished publishing compile-time exports.
@@ -120,6 +136,47 @@ public static class DependoCatalog
     }
 
     /// <summary>
+    /// Skips assemblies whose full name starts with one of <paramref name="prefixes"/>, in addition to
+    /// <see cref="AppDomainTypeFinder.AssemblySkipLoadingPattern"/>.
+    /// </summary>
+    /// <param name="prefixes">
+    /// Name prefixes such as <c>AWSSDK</c> or <c>Azure</c>. Matching is case-insensitive and uses the start
+    /// of the assembly full name, so <c>Azure</c> skips <c>Azure.Core</c>. Call this before the container is built.
+    /// The built-in skip pattern stays in place.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="prefixes"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">A prefix is empty or whitespace.</exception>
+    public static void SkipAssembliesStartingWith(params string[] prefixes)
+    {
+        ArgumentNullException.ThrowIfNull(prefixes);
+
+        var normalized = new string[prefixes.Length];
+        for (int index = 0; index < prefixes.Length; index++)
+        {
+            string prefix = prefixes[index];
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
+                throw new ArgumentException("An assembly skip prefix cannot be empty.", nameof(prefixes));
+            }
+
+            normalized[index] = prefix.Trim();
+        }
+
+        lock (gate)
+        {
+            foreach (string prefix in normalized)
+            {
+                if (HasSkipAssemblyPrefix(prefix))
+                {
+                    continue;
+                }
+
+                skipAssemblyPrefixes.Add(prefix);
+            }
+        }
+    }
+
+    /// <summary>
     /// Finishes compile-time publication. Later calls are ignored.
     /// </summary>
     public static void Seal()
@@ -186,11 +243,41 @@ public static class DependoCatalog
         {
             isSealed = false;
             ProbeBinFolder = true;
+            skipAssemblyPrefixes.Clear();
             knownServices.Clear();
             exports.Clear();
             knownAssemblies.Clear();
             scannedAssemblies.Clear();
         }
+    }
+
+    internal static bool MatchesSkipAssemblyPrefix(string assemblyFullName)
+    {
+        lock (gate)
+        {
+            foreach (string prefix in skipAssemblyPrefixes)
+            {
+                if (assemblyFullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool HasSkipAssemblyPrefix(string prefix)
+    {
+        foreach (string existing in skipAssemblyPrefixes)
+        {
+            if (existing.Equals(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void AbsorbLoadedAssemblies(Func<Assembly, bool> includeAssembly)

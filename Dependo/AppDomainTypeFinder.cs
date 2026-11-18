@@ -19,7 +19,10 @@ public class AppDomainTypeFinder : ITypeFinder
     /// <summary>Gets or sets the pattern for assemblies that will be investigated.</summary>
     public string AssemblyRestrictToLoadingPattern { get; set; } = ".*";
 
-    /// <summary>Gets the pattern for assemblies that we know don't need to be investigated.</summary>
+    /// <summary>
+    /// Gets or sets the pattern for assemblies that we know don't need to be investigated.
+    /// Prefixes added with <see cref="DependoCatalog.SkipAssembliesStartingWith"/> are skipped as well.
+    /// </summary>
     public string AssemblySkipLoadingPattern { get; set; } = "^System|^mscorlib|^Microsoft|^Autofac|^AutoMapper|^Castle|^EntityFramework|^EPPlus|^FluentValidation|^log4net|^Newtonsoft|^NLog|^Serilog|^SixLabors|^StackExchange|^Telerik";
 
     /// <summary>Gets or sets whether Dependo should iterate assemblies in the app domain when loading types.</summary>
@@ -174,6 +177,7 @@ public class AppDomainTypeFinder : ITypeFinder
     /// </returns>
     public virtual bool IsAssemblySafeToLoad(string assemblyFullName) =>
         !AssemblyNameMatches(assemblyFullName, AssemblySkipLoadingPattern)
+            && !DependoCatalog.MatchesSkipAssemblyPrefix(assemblyFullName)
             && AssemblyNameMatches(assemblyFullName, AssemblyRestrictToLoadingPattern);
 
     /// <summary>
