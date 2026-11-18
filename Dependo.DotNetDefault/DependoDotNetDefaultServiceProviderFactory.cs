@@ -9,6 +9,7 @@ namespace Dependo.DotNetDefault;
 public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
 {
     private readonly Action<IServiceCollection> configurationAction;
+
     /// <summary>
     /// The services.
     /// </summary>
@@ -51,17 +52,11 @@ public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactor
         }
 
         // Build service provider for configuration access
-#pragma warning disable DF0010  // Should not be disposed here.
         var provider = services.BuildServiceProvider();
-#pragma warning restore DF0010
-
         var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container
-#pragma warning disable DF0010 // Should not be disposed here.
         var dependoContainer = new DotNetDefaultDependoContainer();
-#pragma warning restore DF0010
-
         var serviceProvider = dependoContainer.ConfigureServices(serviceCollection, configuration!);
 
         // Set dependo container as the singleton instance
@@ -69,4 +64,4 @@ public class DependoDotNetDefaultServiceProviderFactory : IServiceProviderFactor
 
         return serviceProvider;
     }
-} 
+}

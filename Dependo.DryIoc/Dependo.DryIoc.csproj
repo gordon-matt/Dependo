@@ -4,7 +4,6 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>1.2.3</Version>
 		<Description>DryIoc implementation for Dependo</Description>
 		<PackageTags>dependency-injection;ioc;dryioc;dependency-resolver;registrar;aspnetcore</PackageTags>
 	</PropertyGroup>
@@ -20,6 +19,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Dependo\Dependo.csproj" />
+		<ProjectReference Include="..\Dependo.Generator\Dependo.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" />
 	</ItemGroup>
 
+	<Import Project="..\Dependo.Generator\PackAnalyzer.targets" />
 </Project>

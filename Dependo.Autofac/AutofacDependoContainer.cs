@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using System.Xml.Linq;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.Extensions.Configuration;
 
 namespace Dependo.Autofac;
@@ -53,15 +51,9 @@ public class AutofacDependoContainer : BaseDependoContainer
     public override bool IsRegistered(Type serviceType) => _container.IsRegistered(serviceType);
 
     /// <inheritdoc />
-    public override T Resolve<T>() where T : class
-    {
-        if (_container == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return _container?.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
-    }
+    public override T Resolve<T>() where T : class => _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container?.Resolve<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
     public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class
@@ -76,15 +68,9 @@ public class AutofacDependoContainer : BaseDependoContainer
     }
 
     /// <inheritdoc />
-    public override object Resolve(Type type)
-    {
-        if (_container == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return _container?.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
-    }
+    public override object Resolve(Type type) => _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container?.Resolve(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
 
     /// <inheritdoc />
     public override T ResolveKeyed<T>(object key) where T : class => _container.ResolveKeyed<T>(key);
@@ -100,40 +86,22 @@ public class AutofacDependoContainer : BaseDependoContainer
     public override IEnumerable<T> ResolveAllKeyed<T>(object key) => _container.ResolveKeyed<IEnumerable<T>>(key);
 
     /// <inheritdoc />
-    public override T ResolveNamed<T>(string name) where T : class
-    {
-        if (_container == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return _container?.ResolveNamed<T>(name)
+    public override T ResolveNamed<T>(string name) where T : class => _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container?.ResolveNamed<T>(name)
             ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name} with name '{name}'");
-    }
 
     /// <inheritdoc />
-    public override IEnumerable<T> ResolveAll<T>()
-    {
-        if (_container == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return _container?.Resolve<IEnumerable<T>>()
+    public override IEnumerable<T> ResolveAll<T>() => _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container?.Resolve<IEnumerable<T>>()
             ?? throw new InvalidOperationException($"Could not resolve any {typeof(T).Name}");
-    }
 
     /// <inheritdoc />
-    public override IEnumerable<T> ResolveAllNamed<T>(string name)
-    {
-        if (_container == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return _container?.ResolveNamed<IEnumerable<T>>(name)
+    public override IEnumerable<T> ResolveAllNamed<T>(string name) => _container == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : _container?.ResolveNamed<IEnumerable<T>>(name)
             ?? throw new InvalidOperationException($"Could not resolve any {typeof(T).Name} with name '{name}'");
-    }
 
     /// <inheritdoc />
     public override bool TryResolve<T>(out T? instance) where T : class
@@ -212,16 +180,9 @@ public class AutofacDependoContainer : BaseDependoContainer
 
         // Create service provider
 
-#pragma warning disable DF0010 // Should not be disposed here.
         var container = containerBuilder.Build();
-#pragma warning restore DF0010 //
-
         _container = container;
-
-#pragma warning disable DF0022 // Should not be disposed here.
         ServiceProvider = new AutofacServiceProvider(container);
-#pragma warning restore DF0022 //
-
         return ServiceProvider;
     }
 

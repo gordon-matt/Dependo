@@ -1,12 +1,5 @@
 using Autofac;
 using Dependo.Autofac;
-using Dependo.DotNetDefault;
-using Dependo.DryIoc;
-using Dependo.Lamar;
-using Dependo.LightInject;
-using DryIoc;
-using Lamar;
-using LightInject;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,21 +26,21 @@ builder.Host
     {
         // Add your Autofac-specific registrations here or use an IAutofacDependencyRegistrar
     });
-    //.UseServiceProviderFactory(new DependoDryIocServiceProviderFactory())
-    //.ConfigureContainer<DryIoc.Container>(container =>
-    // {
-    //     // Add your DryIoc-specific registrations here or use an IDryIocDependencyRegistrar
-    // });
-    //.UseServiceProviderFactory(new DependoLamarServiceProviderFactory())
-    //.ConfigureContainer<ServiceRegistry>(container =>
-    // {
-    //     // Add your Lamar-specific registrations here or use an ILamarDependencyRegistrar
-    // });
-    //.UseServiceProviderFactory(new DependoLightInjectServiceProviderFactory()) // LightInject implementation not working yet
-    //.ConfigureContainer<ServiceContainer>(container =>
-    //{
-    //    // Add your LightInject-specific registrations here or use an ILightInjectDependencyRegistrar
-    //});
+//.UseServiceProviderFactory(new DependoDryIocServiceProviderFactory())
+//.ConfigureContainer<DryIoc.Container>(container =>
+// {
+//     // Add your DryIoc-specific registrations here or use an IDryIocDependencyRegistrar
+// });
+//.UseServiceProviderFactory(new DependoLamarServiceProviderFactory())
+//.ConfigureContainer<ServiceRegistry>(container =>
+// {
+//     // Add your Lamar-specific registrations here or use an ILamarDependencyRegistrar
+// });
+//.UseServiceProviderFactory(new DependoLightInjectServiceProviderFactory()) // LightInject implementation not working yet
+//.ConfigureContainer<ServiceContainer>(container =>
+//{
+//    // Add your LightInject-specific registrations here or use an ILightInjectDependencyRegistrar
+//});
 
 var app = builder.Build();
 

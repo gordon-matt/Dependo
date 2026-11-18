@@ -13,6 +13,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
 		<PackageReference Include="Moq" Version="4.21.0" />
 		<PackageReference Include="xunit" Version="2.9.3" />
@@ -28,6 +29,7 @@
 		<ProjectReference Include="..\Dependo.DryIoc\Dependo.DryIoc.csproj" />
 		<ProjectReference Include="..\Dependo.Lamar\Dependo.Lamar.csproj" />
 		<ProjectReference Include="..\Dependo.LightInject\Dependo.LightInject.csproj" />
+		<ProjectReference Include="..\Dependo.Generator\Dependo.Generator.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -30,13 +30,7 @@ public class DryIocDependoContainerTests : DependoContainerTestsBase<DryIocDepen
     public override void ResolveAllNamed_MultipleNamedInstances_ReturnsAllInstances()
     {
         // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-        {
-            containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
-
-            // Attempting to register more than one service of the same type with the same key results in an exception anyway.
-            //containerBuilder.Register<ITestService, AnotherTestService>(ServiceLifetime.Singleton, "test-services");
-        });
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton));
 
         // Act & Assert
         Assert.Throws<NotSupportedException>(() =>
@@ -47,13 +41,7 @@ public class DryIocDependoContainerTests : DependoContainerTestsBase<DryIocDepen
     public override void ResolveAllKeyed_MultipleKeyedInstances_ReturnsAllInstances()
     {
         // Arrange
-        using var dependoContainer = ConfigureDependoContainer(() =>
-        {
-            containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton);
-
-            // Attempting to register more than one service of the same type with the same key results in an exception anyway.
-            //containerBuilder.RegisterNamed<ITestService, AnotherTestService>("test-services", ServiceLifetime.Singleton);
-        });
+        using var dependoContainer = ConfigureDependoContainer(() => containerBuilder.RegisterNamed<ITestService, TestService>("test-services", ServiceLifetime.Singleton));
 
         // Act & Assert
         Assert.Throws<NotSupportedException>(() =>

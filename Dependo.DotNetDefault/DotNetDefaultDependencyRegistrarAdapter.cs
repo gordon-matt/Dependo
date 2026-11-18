@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.DotNetDefault;
 
@@ -55,4 +54,4 @@ public class DotNetDefaultDependencyRegistrarAdapter : IDependencyRegistrarAdapt
         // Create and return the adapter
         return new DotNetDefaultDependencyRegistrarAdapter(dotNetDefaultRegistrar);
     }
-} 
+}
