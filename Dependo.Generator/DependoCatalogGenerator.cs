@@ -22,14 +22,11 @@ public sealed class DependoCatalogGenerator : IIncrementalGenerator
     {
         var mode = context.AnalyzerConfigOptionsProvider.Select(static (options, _) =>
         {
-            options.GlobalOptions.TryGetValue("build_property.Dependocatalog", out var value);
+            options.GlobalOptions.TryGetValue("build_property.Dependocatalog", out string? value);
             return value ?? string.Empty;
         });
 
-        context.RegisterSourceOutput(context.CompilationProvider.Combine(mode), static (source, input) =>
-        {
-            Execute(input.Left, input.Right, source);
-        });
+        context.RegisterSourceOutput(context.CompilationProvider.Combine(mode), static (source, input) => Execute(input.Left, input.Right, source));
     }
 
     private static void Execute(Compilation compilation, string mode, SourceProductionContext source)
@@ -245,7 +242,7 @@ public sealed class DependoCatalogGenerator : IIncrementalGenerator
 
         AppendExports(builder, exports);
 
-        foreach (var assemblyName in GetParticipatingAssemblies(compilation))
+        foreach (string assemblyName in GetParticipatingAssemblies(compilation))
         {
             builder.Append("            global::System.Reflection.Assembly.Load(\"");
             builder.Append(Escape(assemblyName));
@@ -291,7 +288,7 @@ public sealed class DependoCatalogGenerator : IIncrementalGenerator
         }
 
         names.Sort(System.StringComparer.Ordinal);
-        foreach (var name in names)
+        foreach (string name in names)
         {
             yield return name;
         }
@@ -318,24 +315,11 @@ public sealed class DependoCatalogGenerator : IIncrementalGenerator
     private static string Escape(string value) =>
         value.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
-    private static bool IsConcreteClass(INamedTypeSymbol type)
-    {
-        if (type.TypeKind != TypeKind.Class || type.IsAbstract || type.IsStatic)
-        {
-            return false;
-        }
-
-        if (type.Name.Contains("<") || type.IsImplicitlyDeclared)
-        {
-            return false;
-        }
-
-        return type.ContainingNamespace?.ToDisplayString().StartsWith("DependoGenerated", System.StringComparison.Ordinal) != true;
-    }
+    private static bool IsConcreteClass(INamedTypeSymbol type) => type.TypeKind == TypeKind.Class && !type.IsAbstract && !type.IsStatic && !type.Name.Contains("<") && !type.IsImplicitlyDeclared && type.ContainingNamespace?.ToDisplayString().StartsWith("DependoGenerated", System.StringComparison.Ordinal) != true;
 
     private static bool IsAccessible(INamedTypeSymbol type)
     {
-        for (INamedTypeSymbol? current = type; current != null; current = current.ContainingType)
+        for (var current = type; current != null; current = current.ContainingType)
         {
             if (current.DeclaredAccessibility is not (Accessibility.Public or Accessibility.Internal))
             {

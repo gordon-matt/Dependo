@@ -16,6 +16,7 @@ public class DryIocDependoContainer : BaseDependoContainer
     /// The container.
     /// </summary>
     protected IContainer? _container;
+
     private bool _disposed;
 
     #endregion Private Members
@@ -204,7 +205,7 @@ public class DryIocDependoContainer : BaseDependoContainer
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
-            .Concat(dryIocRegistrars.Select(x => DryIocDependencyRegistrarAdapter.CreateFromType(x)))
+            .Concat(dryIocRegistrars.Select(DryIocDependencyRegistrarAdapter.CreateFromType))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies

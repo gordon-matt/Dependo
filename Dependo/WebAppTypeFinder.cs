@@ -22,14 +22,12 @@ public class WebAppTypeFinder : AppDomainTypeFinder
     /// <returns>Result</returns>
     public override IList<Assembly> GetAssemblies()
     {
-        LoadBinFolderAssemblies();
+        EnsureCatalogAssembliesLoaded();
         return base.GetAssemblies();
     }
 
     /// <inheritdoc />
-    protected override void EnsureCatalogAssembliesLoaded() => LoadBinFolderAssemblies();
-
-    private void LoadBinFolderAssemblies()
+    protected override void EnsureCatalogAssembliesLoaded()
     {
         // ProbeBinFolder stays on for hosts that discover plugins by loading every DLL.
         // A host that loads plugins itself turns it off and avoids that walk at startup.

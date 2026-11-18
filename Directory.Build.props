@@ -9,6 +9,7 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageIcon>PackageIcon.jpg</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Version>1.3.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="$(MSBuildThisFileDirectory)_Misc\PackageIcon.jpg" Pack="true" PackagePath="\" Visible="false" />

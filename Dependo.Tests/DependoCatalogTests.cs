@@ -1,5 +1,3 @@
-using Dependo;
-
 namespace Dependo.Tests;
 
 [CollectionDefinition(Name, DisableParallelization = true)]
@@ -11,7 +9,10 @@ public sealed class DependoCatalogCollection
 [Collection(DependoCatalogCollection.Name)]
 public sealed class DependoCatalogTests
 {
-    public DependoCatalogTests() => DependoCatalog.Reset();
+    public DependoCatalogTests()
+    {
+        DependoCatalog.Reset();
+    }
 
     [Fact]
     public void TryGetExports_BeforeSeal_ReturnsFalse()
@@ -84,7 +85,10 @@ public sealed class DependoCatalogTests
 [Collection(DependoCatalogCollection.Name)]
 public sealed class AppDomainTypeFinderFilterTests
 {
-    public AppDomainTypeFinderFilterTests() => DependoCatalog.Reset();
+    public AppDomainTypeFinderFilterTests()
+    {
+        DependoCatalog.Reset();
+    }
 
     [Fact]
     public void FindClassesOfType_SkipPattern_DoesNotReflectMatchingAssemblies()

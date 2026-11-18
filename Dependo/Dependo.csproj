@@ -3,7 +3,6 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>1.3.0</Version>
 		<Description>A simple dependency resolution system for .NET Core applications.</Description>
 		<PackageTags>dependency-injection;ioc;service-locator;dependency-resolver;registrar;aspnetcore</PackageTags>
 	</PropertyGroup>

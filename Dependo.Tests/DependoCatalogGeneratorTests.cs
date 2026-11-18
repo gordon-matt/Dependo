@@ -1,9 +1,6 @@
-using System.Linq;
-using System.Reflection;
 using Dependo.Generator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Xunit;
 
 namespace Dependo.Tests;
 
@@ -68,7 +65,6 @@ public sealed class DependoCatalogGeneratorTests
             using Dependo;
 
             [assembly: DependoExports(typeof(IWidget))]
-
             public interface IWidget;
 
             public sealed class ClockWidget : IWidget;

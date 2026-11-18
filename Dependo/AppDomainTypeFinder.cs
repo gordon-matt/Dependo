@@ -41,15 +41,9 @@ public class AppDomainTypeFinder : ITypeFinder
     /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
     /// <returns>Result</returns>
     /// <returns></returns>
-    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true)
-    {
-        if (TryGetCatalogExports(assignTypeFrom, onlyConcreteClasses, out var exported))
-        {
-            return exported;
-        }
-
-        return FindClassesOfType(assignTypeFrom, GetAssemblies(), onlyConcreteClasses, applyAssemblyFilter: true);
-    }
+    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true) => TryGetCatalogExports(assignTypeFrom, onlyConcreteClasses, out var exported)
+            ? exported
+            : FindClassesOfType(assignTypeFrom, GetAssemblies(), onlyConcreteClasses, applyAssemblyFilter: true);
 
     /// <summary>
     /// Find classes of type

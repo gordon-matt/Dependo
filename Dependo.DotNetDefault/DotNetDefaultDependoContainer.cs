@@ -1,4 +1,3 @@
-using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -125,7 +124,7 @@ public class DotNetDefaultDependoContainer : BaseDependoContainer
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
-            .Concat(dotNetDefaultRegistrars.Select(x => DotNetDefaultDependencyRegistrarAdapter.CreateFromType(x)))
+            .Concat(dotNetDefaultRegistrars.Select(DotNetDefaultDependencyRegistrarAdapter.CreateFromType))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies

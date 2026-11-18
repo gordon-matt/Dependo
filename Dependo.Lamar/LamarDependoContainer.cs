@@ -1,4 +1,3 @@
-using System.Xml.Linq;
 using Lamar;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +15,7 @@ public class LamarDependoContainer : BaseDependoContainer
     /// The container.
     /// </summary>
     protected Container? _container;
+
     private bool _disposed;
 
     #endregion Private Members
@@ -144,7 +144,7 @@ public class LamarDependoContainer : BaseDependoContainer
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
-            .Concat(lamarRegistrars.Select(x => LamarDependencyRegistrarAdapter.CreateFromType(x)))
+            .Concat(lamarRegistrars.Select(LamarDependencyRegistrarAdapter.CreateFromType))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies
@@ -155,10 +155,7 @@ public class LamarDependoContainer : BaseDependoContainer
 
         // Create container
 
-#pragma warning disable DF0100 // Should not be disposed here.
         var container = new Container(serviceRegistry);
-#pragma warning restore DF0100
-
         return container;
     }
 

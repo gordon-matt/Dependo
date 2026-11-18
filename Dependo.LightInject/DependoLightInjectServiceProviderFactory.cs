@@ -12,6 +12,7 @@ namespace Dependo.LightInject;
 public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<ServiceContainer>
 {
     private readonly Action<ServiceContainer> configurationAction;
+
     /// <summary>
     /// The services.
     /// </summary>
@@ -65,24 +66,15 @@ public class DependoLightInjectServiceProviderFactory : IServiceProviderFactory<
         }
 
         // Build service provider for configuration access
-#pragma warning disable DF0010  // Should not be disposed here.
         var provider = services.BuildServiceProvider();
-#pragma warning restore DF0010
-
         var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container
-#pragma warning disable DF0010 // Should not be disposed here.
         var dependoContainer = new LightInjectDependoContainer();
-#pragma warning restore DF0010
-
         var serviceProvider = dependoContainer.ConfigureServices(container, configuration!);
 
         // Set dependo container as the singleton instance
-#pragma warning disable DF0001 // Should not be disposed here.
         DependoResolver.Create(dependoContainer);
-#pragma warning restore DF0001
-
         return serviceProvider;
     }
 }

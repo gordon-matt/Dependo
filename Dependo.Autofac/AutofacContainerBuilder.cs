@@ -1,6 +1,5 @@
 using Autofac;
 using Autofac.Builder;
-using Autofac.Features.OpenGenerics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dependo.Autofac;
@@ -165,9 +164,11 @@ public class AutofacContainerBuilder : IContainerBuilder
             case ServiceLifetime.Singleton:
                 registration.SingleInstance();
                 break;
+
             case ServiceLifetime.Scoped:
                 registration.InstancePerLifetimeScope();
                 break;
+
             case ServiceLifetime.Transient:
                 registration.InstancePerDependency();
                 break;
@@ -181,9 +182,11 @@ public class AutofacContainerBuilder : IContainerBuilder
             case ServiceLifetime.Singleton:
                 registration.SingleInstance();
                 break;
+
             case ServiceLifetime.Scoped:
                 registration.InstancePerLifetimeScope();
                 break;
+
             case ServiceLifetime.Transient:
                 registration.InstancePerDependency();
                 break;

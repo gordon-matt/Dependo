@@ -7,7 +7,7 @@ namespace Dependo;
 /// </summary>
 internal static class AssemblyTypeList
 {
-    private static readonly Dictionary<Assembly, Type[]> cache = new();
+    private static readonly Dictionary<Assembly, Type[]> cache = [];
 
     /// <summary>
     /// Returns the types in <paramref name="assembly"/>, including the types that survived a
@@ -44,20 +44,16 @@ internal static class AssemblyTypeList
     /// <summary>
     /// Returns true when <paramref name="type"/> is a concrete class assignable to <paramref name="assignTypeFrom"/>.
     /// </summary>
-    public static bool IsConcreteMatch(Type type, Type assignTypeFrom)
-    {
-        if (type.IsInterface || type.IsAbstract)
-        {
-            return false;
-        }
-
-        if (assignTypeFrom.IsAssignableFrom(type))
-        {
-            return true;
-        }
-
-        return assignTypeFrom.IsGenericTypeDefinition && ImplementsOpenGeneric(type, assignTypeFrom);
-    }
+    public static bool IsConcreteMatch(Type type, Type assignTypeFrom) =>
+        !type.IsInterface &&
+        !type.IsAbstract &&
+        (
+            assignTypeFrom.IsAssignableFrom(type) ||
+            (
+                assignTypeFrom.IsGenericTypeDefinition &&
+                ImplementsOpenGeneric(type, assignTypeFrom)
+            )
+        );
 
     /// <summary>
     /// Keeps the historical open-generic check used by assembly scanning.

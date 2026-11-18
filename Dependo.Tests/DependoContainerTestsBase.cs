@@ -7,13 +7,21 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
     where TContainerBuilder : IContainerBuilder
 {
     // Test interfaces and classes
-    public interface ITestService { }
+    public interface ITestService
+    { }
 
     // Add generic test interfaces and classes
-    public interface IGenericService<T> { }
-    public class GenericService<T> : IGenericService<T> { }
-    public class StringGenericService : IGenericService<string> { }
-    public class IntGenericService : IGenericService<int> { }
+    public interface IGenericService<T>
+    { }
+
+    public class GenericService<T> : IGenericService<T>
+    { }
+
+    public class StringGenericService : IGenericService<string>
+    { }
+
+    public class IntGenericService : IGenericService<int>
+    { }
 
     protected abstract TContainerBuilder ContainerBuilder { get; }
 
@@ -130,8 +138,7 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
         using var dependoContainer = ConfigureDependoContainer(() => { });
 
         // Act & Assert
-        Assert.ThrowsAny<Exception>(() =>
-            dependoContainer.Resolve<ITestService>());
+        Assert.ThrowsAny<Exception>(dependoContainer.Resolve<ITestService>);
     }
 
     [Fact]
@@ -394,9 +401,12 @@ public abstract class DependoContainerTestsBase<TContainer, TContainerBuilder>
 
     protected abstract TContainer ConfigureDependoContainer(Action registerServices);
 
-    public class AnotherTestService : ITestService { }
+    public class AnotherTestService : ITestService
+    { }
 
-    public class ConcreteService { }
+    public class ConcreteService
+    { }
 
-    public class TestService : ITestService { }
+    public class TestService : ITestService
+    { }
 }

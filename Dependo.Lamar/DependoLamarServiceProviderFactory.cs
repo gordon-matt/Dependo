@@ -10,6 +10,7 @@ namespace Dependo.Lamar;
 public class DependoLamarServiceProviderFactory : IServiceProviderFactory<ServiceRegistry>
 {
     private readonly Action<ServiceRegistry> configurationAction;
+
     /// <summary>
     /// The services.
     /// </summary>
@@ -55,17 +56,11 @@ public class DependoLamarServiceProviderFactory : IServiceProviderFactory<Servic
         }
 
         // Build service provider for configuration access
-#pragma warning disable DF0010  // Should not be disposed here.
         var provider = services.BuildServiceProvider();
-#pragma warning restore DF0010
-
         var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container
-#pragma warning disable DF0010 // Should not be disposed here.
         var dependoContainer = new LamarDependoContainer();
-#pragma warning restore DF0010
-
         var serviceProvider = dependoContainer.ConfigureServices(serviceRegistry, configuration!);
 
         // Set dependo container as the singleton instance

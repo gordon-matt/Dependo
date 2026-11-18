@@ -22,7 +22,7 @@ public static class DependoCatalog
 {
     private static readonly object gate = new();
     private static readonly HashSet<Type> knownServices = [];
-    private static readonly Dictionary<Type, List<Type>> exports = new();
+    private static readonly Dictionary<Type, List<Type>> exports = [];
     private static readonly HashSet<Assembly> knownAssemblies = [];
     private static readonly HashSet<Assembly> scannedAssemblies = [];
     private static bool isSealed;

@@ -16,6 +16,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
     /// The container.
     /// </summary>
     protected IServiceContainer? _container;
+
     private bool _disposed;
 
     #endregion Private Members
@@ -50,41 +51,23 @@ public class LightInjectDependoContainer : BaseDependoContainer
     #region IDependoContainer Members
 
     /// <inheritdoc />
-    public override bool IsRegistered(Type serviceType)
-    {
-        if (ServiceProvider == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return ServiceProvider.GetService(serviceType) != null;
-    }
+    public override bool IsRegistered(Type serviceType) => ServiceProvider == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : ServiceProvider.GetService(serviceType) != null;
 
     /// <inheritdoc />
-    public override T Resolve<T>() where T : class
-    {
-        if (ServiceProvider == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
-    }
+    public override T Resolve<T>() where T : class => ServiceProvider == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : ServiceProvider.GetService<T>() ?? throw new InvalidOperationException($"Could not resolve {typeof(T).Name}");
 
     /// <inheritdoc />
     public override T Resolve<T>(IDictionary<string, object> ctorArgs) where T : class =>
         throw new NotSupportedException("LightInject does not support passing constructor arguments");
 
     /// <inheritdoc />
-    public override object Resolve(Type type)
-    {
-        if (ServiceProvider == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
-    }
+    public override object Resolve(Type type) => ServiceProvider == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : ServiceProvider.GetService(type) ?? throw new InvalidOperationException($"Could not resolve {type.Name}");
 
     /// <inheritdoc />
     public override T ResolveKeyed<T>(object key) where T : class => ResolveNamed<T>(DependoHelper.StringifyKey(key));
@@ -99,26 +82,14 @@ public class LightInjectDependoContainer : BaseDependoContainer
             "LightInject does not support multiple registrations of the same type and key. When registering, they get overriden. Call ResolveKeyed<T> instead");
 
     /// <inheritdoc />
-    public override T ResolveNamed<T>(string name) where T : class
-    {
-        if (ServiceProvider == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return ServiceProvider.GetKeyedService<T>(name);
-    }
+    public override T ResolveNamed<T>(string name) where T : class => ServiceProvider == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : ServiceProvider.GetKeyedService<T>(name);
 
     /// <inheritdoc />
-    public override IEnumerable<T> ResolveAll<T>()
-    {
-        if (ServiceProvider == null)
-        {
-            throw new InvalidOperationException("Container is not initialized");
-        }
-
-        return ServiceProvider.GetServices<T>();
-    }
+    public override IEnumerable<T> ResolveAll<T>() => ServiceProvider == null
+            ? throw new InvalidOperationException("Container is not initialized")
+            : ServiceProvider.GetServices<T>();
 
     /// <inheritdoc />
     public override IEnumerable<T> ResolveAllNamed<T>(string name) =>
@@ -197,7 +168,7 @@ public class LightInjectDependoContainer : BaseDependoContainer
         // Create and sort instances of dependency registrars
         var instances = dependencyRegistrars
             .Select(x => (IDependencyRegistrar)Activator.CreateInstance(x)!)
-            .Concat(lightInjectRegistrars.Select(x => LightInjectDependencyRegistrarAdapter.CreateFromType(x)))
+            .Concat(lightInjectRegistrars.Select(LightInjectDependencyRegistrarAdapter.CreateFromType))
             .OrderBy(x => x.Order);
 
         // Register all provided dependencies

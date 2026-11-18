@@ -11,6 +11,7 @@ namespace Dependo.DryIoc;
 public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<IContainer>
 {
     private readonly Action<IContainer> _configurationAction;
+
     /// <summary>
     /// The services.
     /// </summary>
@@ -59,17 +60,11 @@ public class DependoDryIocServiceProviderFactory : IServiceProviderFactory<ICont
         }
 
         // Build service provider for configuration access
-#pragma warning disable DF0010  // Should not be disposed here.
         var provider = _services.BuildServiceProvider();
-#pragma warning restore DF0010
-
         var configuration = provider.GetService<IConfiguration>();
 
         // Initialize dependo container
-#pragma warning disable DF0010 // Should not be disposed here.
         var dependoContainer = new DryIocDependoContainer();
-#pragma warning restore DF0010
-
         var serviceProvider = dependoContainer.ConfigureServices(container, configuration!);
 
         // Set dependo container as the singleton instance
