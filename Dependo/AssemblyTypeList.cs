@@ -56,9 +56,10 @@ internal static class AssemblyTypeList
         );
 
     /// <summary>
-    /// Keeps the historical open-generic check used by assembly scanning.
+    /// Returns true when <paramref name="type"/> implements <paramref name="openGeneric"/>.
+    /// Every implemented generic interface is checked. The first one is not necessarily the match.
     /// </summary>
-    private static bool ImplementsOpenGeneric(Type type, Type openGeneric)
+    internal static bool ImplementsOpenGeneric(Type type, Type openGeneric)
     {
         try
         {
@@ -70,7 +71,10 @@ internal static class AssemblyTypeList
                     continue;
                 }
 
-                return genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
+                if (genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition()))
+                {
+                    return true;
+                }
             }
 
             return false;

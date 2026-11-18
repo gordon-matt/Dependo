@@ -28,6 +28,11 @@ public class AppDomainTypeFinder : ITypeFinder
     /// <summary>Gets or sets whether Dependo should iterate assemblies in the app domain when loading types.</summary>
     public bool LoadAppDomainAssemblies { get; set; } = true;
 
+    private IList<Assembly>? cachedAssemblies;
+    private int cachedAssemblyVersion = -1;
+    private bool cachedLoadAppDomainAssemblies;
+    private string[] cachedAssemblyNames = [];
+
     /// <summary>
     /// Find classes of type
     /// </summary>
@@ -149,10 +154,21 @@ public class AppDomainTypeFinder : ITypeFinder
 
     /// <summary>
     /// Gets the assemblies related to the current implementation.
+    /// The same list is reused until an assembly loads or <see cref="AssemblyNames"/> or
+    /// <see cref="LoadAppDomainAssemblies"/> changes.
     /// </summary>
     /// <returns>A list of assemblies</returns>
     public virtual IList<Assembly> GetAssemblies()
     {
+        int version = DependoCatalog.AssemblyLoadVersion;
+        if (cachedAssemblies != null
+            && cachedAssemblyVersion == version
+            && cachedLoadAppDomainAssemblies == LoadAppDomainAssemblies
+            && AssemblyNamesMatchCache())
+        {
+            return cachedAssemblies;
+        }
+
         var addedAssemblyNames = new List<string>();
         var assemblies = new List<Assembly>();
 
@@ -162,6 +178,15 @@ public class AppDomainTypeFinder : ITypeFinder
         }
 
         AddConfiguredAssemblies(addedAssemblyNames, assemblies);
+
+        // A load during the walk belongs to the next version. Keep this list for the caller and rebuild next time.
+        if (DependoCatalog.AssemblyLoadVersion == version)
+        {
+            cachedAssemblies = assemblies;
+            cachedAssemblyVersion = version;
+            cachedLoadAppDomainAssemblies = LoadAppDomainAssemblies;
+            cachedAssemblyNames = AssemblyNames.ToArray();
+        }
 
         return assemblies;
     }
@@ -214,32 +239,30 @@ public class AppDomainTypeFinder : ITypeFinder
         Regex.IsMatch(assemblyFullName, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
-    /// Does type implement generic?
+    /// Returns true when <paramref name="type"/> implements the open generic <paramref name="openGeneric"/>.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="openGeneric"></param>
-    /// <returns></returns>
-    protected virtual bool DoesTypeImplementOpenGeneric(Type type, Type openGeneric)
+    /// <param name="type">The candidate type.</param>
+    /// <param name="openGeneric">The open generic interface to look for.</param>
+    /// <returns>True when any implemented generic interface matches.</returns>
+    protected virtual bool DoesTypeImplementOpenGeneric(Type type, Type openGeneric) =>
+        AssemblyTypeList.ImplementsOpenGeneric(type, openGeneric);
+
+    private bool AssemblyNamesMatchCache()
     {
-        try
+        if (cachedAssemblyNames.Length != AssemblyNames.Count)
         {
-            var genericTypeDefinition = openGeneric.GetGenericTypeDefinition();
-            foreach (var implementedInterface in type.GetInterfaces())
+            return false;
+        }
+
+        for (int index = 0; index < cachedAssemblyNames.Length; index++)
+        {
+            if (!string.Equals(cachedAssemblyNames[index], AssemblyNames[index], StringComparison.Ordinal))
             {
-                if (!implementedInterface.IsGenericType)
-                {
-                    continue;
-                }
-
-                return genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
+                return false;
             }
+        }
 
-            return false;
-        }
-        catch
-        {
-            return false;
-        }
+        return true;
     }
 
     /// <summary>

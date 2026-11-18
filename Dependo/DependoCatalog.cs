@@ -27,7 +27,20 @@ public static class DependoCatalog
     private static readonly HashSet<Assembly> knownAssemblies = [];
     private static readonly HashSet<Assembly> scannedAssemblies = [];
     private static readonly List<string> skipAssemblyPrefixes = [];
+    private static int loadedAssemblyVersion;
+    private static int absorbedAssemblyVersion = -1;
     private static bool isSealed;
+
+    static DependoCatalog()
+    {
+        AppDomain.CurrentDomain.AssemblyLoad += (_, args) =>
+        {
+            if (!args.LoadedAssembly.IsDynamic)
+            {
+                Interlocked.Increment(ref loadedAssemblyVersion);
+            }
+        };
+    }
 
     /// <summary>
     /// Gets or sets whether a sealed catalog may load every eligible DLL from the application directory
@@ -248,8 +261,11 @@ public static class DependoCatalog
             exports.Clear();
             knownAssemblies.Clear();
             scannedAssemblies.Clear();
+            absorbedAssemblyVersion = -1;
         }
     }
+
+    internal static int AssemblyLoadVersion => Volatile.Read(ref loadedAssemblyVersion);
 
     internal static bool MatchesSkipAssemblyPrefix(string assemblyFullName)
     {
@@ -282,6 +298,14 @@ public static class DependoCatalog
 
     private static void AbsorbLoadedAssemblies(Func<Assembly, bool> includeAssembly)
     {
+        // Repeated queries reuse the exports recorded last time. A non-dynamic assembly load moves the version
+        // and this walks again, so plugins loaded after startup are still picked up.
+        int versionAtStart = Volatile.Read(ref loadedAssemblyVersion);
+        if (versionAtStart == absorbedAssemblyVersion)
+        {
+            return;
+        }
+
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             if (assembly.IsDynamic || knownAssemblies.Contains(assembly) || !scannedAssemblies.Add(assembly))
@@ -313,6 +337,11 @@ public static class DependoCatalog
                     }
                 }
             }
+        }
+
+        if (Volatile.Read(ref loadedAssemblyVersion) == versionAtStart)
+        {
+            absorbedAssemblyVersion = versionAtStart;
         }
     }
 }
