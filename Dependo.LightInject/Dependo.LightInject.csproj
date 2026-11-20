@@ -9,11 +9,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Extenso.Core" Version="10.2.1" />
-		<PackageReference Include="LightInject" Version="7.1.1" />
-		<PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="4.1.2" />
-		<PackageReference Include="LightInject.Microsoft.Hosting" Version="2.3.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+		<PackageReference Include="Extenso.Core" />
+		<PackageReference Include="LightInject" />
+		<PackageReference Include="LightInject.Microsoft.DependencyInjection" />
+		<PackageReference Include="LightInject.Microsoft.Hosting" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 	</ItemGroup>
 
 	<ItemGroup>

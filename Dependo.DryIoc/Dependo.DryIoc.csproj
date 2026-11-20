@@ -13,8 +13,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DryIoc.dll" Version="6.0.0-preview-09" />
-		<PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="8.0.0-preview-04" />
+		<PackageReference Include="DryIoc.dll" />
+		<PackageReference Include="DryIoc.Microsoft.DependencyInjection" />
 	</ItemGroup>
 
 	<ItemGroup>

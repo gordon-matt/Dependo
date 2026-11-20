@@ -10,7 +10,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Lamar" Version="16.0.0" />
+		<PackageReference Include="Lamar" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Dependo\Dependo.csproj" />

@@ -280,5 +280,3 @@ __pycache__/
 
 ### VisualStudio Patch ###
 build/
-
-NuGet-Push.ps1
